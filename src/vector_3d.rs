@@ -12,7 +12,7 @@ impl Vector3D {
         Vector3D {
             x: OrderedFloat(x),
             y: OrderedFloat(y),
-            z: OrderedFloat(z)
+            z: OrderedFloat(z),
         }
     }
 
@@ -25,8 +25,6 @@ impl Vector3D {
     }
 
     pub fn dot(&self, other: &Vector3D) -> OrderedFloat<f64> {
-        self.x * other.x +
-        self.y * other.y +
-        self.z * other.z
+        self.x * other.x + self.y * other.y + self.z * other.z
     }
 }

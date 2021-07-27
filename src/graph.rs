@@ -76,7 +76,11 @@ impl<N, E> Graph<N, E> {
         let mut edge_data = vec![];
         for node in self.iter_nodes() {
             for edge in node.edges.iter() {
-                edge_data.push((&node.label, &self.arena.get(edge.index).unwrap().label, &edge.label));
+                edge_data.push((
+                    &node.label,
+                    &self.arena.get(edge.index).unwrap().label,
+                    &edge.label,
+                ));
             }
         }
         Box::new(edge_data.into_iter())

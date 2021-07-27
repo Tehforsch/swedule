@@ -1,8 +1,8 @@
 use crate::{
     cell::Cell, direction::Direction, face::Face, graph::Graph, task::Task, vector_3d::Vector3D,
 };
-use ordered_float::OrderedFloat;
 use itertools::Itertools;
+use ordered_float::OrderedFloat;
 
 pub struct Grid {
     data: Graph<Cell, Face>,
@@ -60,10 +60,7 @@ mod tests {
             direction: &direction,
         });
         let labels: Vec<Task> = nodes.iter().map(|node| node.label.clone()).collect();
-        assert_tasks_equal(&labels, &[
-            (0, 0),
-            (1, 0)
-        ]);
+        assert_tasks_equal(&labels, &[(0, 0), (1, 0)]);
     }
 
     fn assert_tasks_equal(tasks: &[Task], indices: &[(i32, i32)]) {
