@@ -7,4 +7,5 @@ edition = "2018"
 
 [dependencies]
 generational-arena = "0.2.8"
-vecmath = "1.0.0"
+itertools = "0.10.1"
+ordered-float = "2.7.0"

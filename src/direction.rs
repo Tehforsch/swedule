@@ -1,6 +1,7 @@
 use crate::vector_3d::Vector3D;
 
+#[derive(Hash, PartialEq, Eq, Clone, Debug)]
 pub struct Direction {
-    vector: Vector3D,
-    index: i32,
+    pub vector: Vector3D,
+    pub index: i32,
 }

@@ -1,6 +1,7 @@
 use crate::vector_3d::Vector3D;
 
 
+#[derive(Hash, PartialEq, Eq, Clone)]
 pub struct Face {
-    normal: Vector3D,
+    pub normal: Vector3D,
 }
