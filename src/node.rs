@@ -1,7 +1,9 @@
 use generational_arena::Index;
 
-pub struct Node<T> {
-    pub label: T,
+use crate::edge::Edge;
+
+pub struct Node<N, E> {
+    pub label: N,
     pub index: Index,
-    pub neighbours: Vec<Index>,
+    pub neighbours: Vec<Edge<E>>,
 }

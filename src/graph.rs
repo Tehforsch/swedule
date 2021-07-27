@@ -4,36 +4,45 @@ use std::collections::{HashMap, HashSet};
 
 use generational_arena::{Arena, Index};
 
+use crate::edge::Edge;
 use crate::node::Node;
 
-pub struct Graph<T> {
-    arena: Arena<Node<T>>,
+pub struct Graph<N, E> {
+    arena: Arena<Node<N, E>>,
 }
 
-impl<T> Graph<T> {
-    pub fn from_edge_list(edges: &[(T, T)]) -> Graph<T>
-    where T: Hash + Eq + Copy {
+impl<N, E> Graph<N, E> {
+    pub fn from_nodes_and_edge_list(nodes: Vec<N>, edges: &[(N, N, E)]) -> Graph<N, E>
+    where N: Eq + Hash + Sized,
+          E: Copy {
         let mut arena = Arena::new();
-        let mut nodes: HashSet<T> = HashSet::new();
-        for label in edges.iter().map(|edge| edge.0).chain(edges.iter().map(|edge| edge.1)) {
-            nodes.insert(label);
-        }
-        let mut label_indices: HashMap<T, Index> = HashMap::new();
         for label in nodes.into_iter() {
-            let index = arena.insert_with(|index| Graph::node_from_index(label, index));
-            label_indices.insert(label, index);
+            arena.insert_with(|index| Graph::node_from_index(label, index));
         }
-        for edge in edges {
-            let index_0 = label_indices[&edge.0];
-            let index_1 = label_indices[&edge.1];
-            arena.get_mut(index_0).unwrap().neighbours.push(index_1);
+        for (label_0, label_1, edge_data) in edges {
+            let index_0 = arena.iter().find(|(_, node)| node.label == *label_0).map(|(index, _)| index).unwrap();
+            let index_1 = arena.iter().find(|(_, node)| node.label == *label_1).map(|(index, _)| index).unwrap();
+            arena.get_mut(index_0).unwrap().neighbours.push(Edge {
+                index: index_1,
+                label: *edge_data,
+            });
         }
         Graph {
             arena
         }
     }
 
-    pub fn node_from_index(label: T, index: Index) -> Node<T> {
+    pub fn from_edge_list(edges: &[(N, N, E)]) -> Graph<N, E>
+    where N: Hash + Eq + Copy,
+    E: Copy{
+        let mut nodes: HashSet<N> = HashSet::new();
+        for label in edges.iter().map(|edge| edge.0).chain(edges.iter().map(|edge| edge.1)) {
+            nodes.insert(label);
+        }
+        Graph::from_nodes_and_edge_list(nodes.into_iter().collect(), edges)
+    }
+
+    pub fn node_from_index(label: N, index: Index) -> Node<N, E> {
         Node {
             label,
             index,
@@ -41,18 +50,18 @@ impl<T> Graph<T> {
         }
     }
 
-    pub fn traverse_depth_first(&self, label: &T) -> Vec<&Node<T>>
-    where T: Hash + Eq {
+    pub fn traverse_depth_first(&self, label: &N) -> Vec<&Node<N, E>>
+    where N: Hash + Eq {
         let node = self.find_node_by_label(label).unwrap();
         let mut result = vec![node];
-        for neighbour in node.neighbours.iter() {
-            result.extend(self.traverse_depth_first(&self.arena[*neighbour].label).into_iter());
+        for edge in node.neighbours.iter() {
+            result.extend(self.traverse_depth_first(&self.arena[edge.index].label).into_iter());
         }
         result
     }
 
-    fn find_node_by_label(&self, label: &T) -> Option<&Node<T>> where
-    T: Hash + Eq{
+    fn find_node_by_label(&self, label: &N) -> Option<&Node<N, E>> where
+    N: Hash + Eq{
         self.arena.iter().map(|(_, node)| node).find(|node| &node.label == label)
     }
 }
