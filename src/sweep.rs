@@ -38,7 +38,8 @@ impl<'a> Sweep<'a> {
             let task_index = processor.get_next_task();
             if let Some(task_index) = task_index {
                 let task_node = self.graph.get(task_index).unwrap();
-                let edge_indices: Vec<Index> = task_node.edges.iter().map(|edge| edge.index).collect();
+                let edge_indices: Vec<Index> =
+                    task_node.edges.iter().map(|edge| edge.index).collect();
                 let task = &task_node.data;
                 processor.solve(&task);
                 for dependency_index in edge_indices.iter() {
@@ -49,12 +50,15 @@ impl<'a> Sweep<'a> {
                         processor.add_task_to_queue(downwind_task_node.index);
                     }
                 }
-            }
-            else {
+            } else {
                 processor.send_tasks();
                 processor.receive_tasks();
             }
-            let num_solved: usize = self.processors.iter().map(|processor| processor.num_solved).sum();
+            let num_solved: usize = self
+                .processors
+                .iter()
+                .map(|processor| processor.num_solved)
+                .sum();
             if num_solved == self.graph.len() {
                 break;
             }
@@ -63,7 +67,10 @@ impl<'a> Sweep<'a> {
 }
 
 fn get_next_free_processor(processors: &mut [Processor]) -> &mut Processor {
-    processors.iter_mut().min_by_key(|processor| processor.time).unwrap()
+    processors
+        .iter_mut()
+        .min_by_key(|processor| processor.time)
+        .unwrap()
 }
 
 fn get_initial_queue<'a>(graph: &DependencyGraph<'a>, processor_num: usize) -> VecDeque<Index> {

@@ -25,12 +25,10 @@ pub mod vector_3d;
 fn main() -> Result<(), Box<dyn Error>> {
     let args = CommandLineArgs::parse();
     let grid = read_grid_file(&args.grid_file)?;
-    let directions = vec![
-        Direction {
-            vector: Vector3D::new(1.0, 0.0, 0.0),
-            index: 0,
-        },
-    ];
+    let directions = vec![Direction {
+        vector: Vector3D::new(1.0, 0.0, 0.0),
+        index: 0,
+    }];
     let num_processors = 1;
     let mut sweep = Sweep::new(&grid, &directions, num_processors);
     sweep.run();

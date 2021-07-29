@@ -10,6 +10,10 @@ pub struct Task<'a> {
 
 impl<'a> std::fmt::Debug for Task<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "({},{})@{}", self.cell.index, self.direction.index, self.processor_num)
+        write!(
+            f,
+            "({},{})@{}",
+            self.cell.index, self.direction.index, self.processor_num
+        )
     }
 }

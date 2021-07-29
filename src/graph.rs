@@ -107,13 +107,10 @@ impl<N, E> Graph<N, E> {
     fn extend(&mut self, mut graph: Graph<N, E>) {
         let mut old_index_to_new_index: HashMap<Index, Index> = HashMap::new();
         for (old_index, mut node) in graph.arena.drain() {
-            let new_index = self
-                .arena
-                .insert_with(|index| {
-                    node.index = index;
-                    node
-                }
-                );
+            let new_index = self.arena.insert_with(|index| {
+                node.index = index;
+                node
+            });
             old_index_to_new_index.insert(old_index, new_index);
         }
         for new_index in old_index_to_new_index.values() {
