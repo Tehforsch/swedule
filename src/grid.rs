@@ -30,7 +30,7 @@ impl Grid {
 
     pub fn from_cell_pairs(cells: Vec<Cell>, pairs: &[(usize, usize)]) -> Grid {
         let edge_list: Vec<(usize, usize, Face)> = pairs
-            .into_iter()
+            .iter()
             .map(|(i0, i1)| {
                 (
                     *i0,
