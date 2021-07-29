@@ -21,6 +21,7 @@ pub mod processor;
 pub mod sweep;
 pub mod task;
 pub mod vector_3d;
+pub mod run_data;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args = CommandLineArgs::parse();
@@ -31,7 +32,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     }];
     let num_processors = 1;
     let mut sweep = Sweep::new(&grid, &directions, num_processors);
-    sweep.run();
+    let run_data = sweep.run();
+    dbg!(run_data.time);
 
     Ok(())
 }

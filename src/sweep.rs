@@ -2,15 +2,7 @@ use std::collections::VecDeque;
 
 use generational_arena::Index;
 
-use crate::{
-    direction::Direction,
-    grid::{DependencyGraph, Grid},
-    processor::Processor,
-};
-
-struct RunData {
-    time: f64,
-}
+use crate::{direction::Direction, grid::{DependencyGraph, Grid}, processor::Processor, run_data::RunData};
 
 pub struct Sweep<'a> {
     graph: DependencyGraph<'a>,
@@ -29,10 +21,7 @@ impl<'a> Sweep<'a> {
         Sweep { graph, processors }
     }
 
-    pub fn run(&mut self) {
-        for x in self.graph.iter_edges() {
-            dbg!(x);
-        }
+    pub fn run(&mut self) -> RunData {
         loop {
             let processor = get_next_free_processor(&mut self.processors);
             let task_index = processor.get_next_task();
@@ -62,6 +51,9 @@ impl<'a> Sweep<'a> {
             if num_solved == self.graph.len() {
                 break;
             }
+        }
+        RunData {
+            time: *self.processors.iter().map(|processor| processor.time).max().unwrap()
         }
     }
 }
