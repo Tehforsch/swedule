@@ -52,7 +52,7 @@ fn read_grid_file(grid_file: &Path) -> io::Result<Grid> {
         let neighbours = split.map(|num| num.parse::<usize>().unwrap());
         let center = Vector3D::new(x, y, z);
         cells.push(Cell {
-            label,
+            index: label,
             center,
             processor_num,
         });

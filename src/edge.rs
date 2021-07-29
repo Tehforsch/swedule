@@ -1,6 +1,6 @@
 use generational_arena::Index;
 
 pub struct Edge<E> {
-    pub label: E,
+    pub data: E,
     pub index: Index,
 }

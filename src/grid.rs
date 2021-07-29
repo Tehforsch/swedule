@@ -24,11 +24,10 @@ impl Grid {
         let mut dependency_data = vec![];
         for (upwind_cell, downwind_cell, face) in self.data.iter_edges() {
             if Grid::is_downwind(face, &direction) {
-                dependency_data.push((upwind_cell.label, downwind_cell.label, Dependency));
-                tasks[downwind_cell.label].num_upwind += 1;
+                dependency_data.push((upwind_cell.index, downwind_cell.index, Dependency));
+                tasks[downwind_cell.index].num_upwind += 1;
             }
         }
-        dbg!(&dependency_data);
         Graph::from_nodes_and_edge_list(tasks, dependency_data)
     }
 
@@ -68,11 +67,11 @@ mod tests {
         };
         let cells = vec![
             Cell {
-                label: 0,
+                index: 0,
                 center: Vector3D::new(0., 0., 0.),
             },
             Cell {
-                label: 1,
+                index: 1,
                 center: Vector3D::new(1., 0., 0.),
             },
         ];
@@ -83,7 +82,7 @@ mod tests {
             cell: &first_cell,
             direction: &direction,
         });
-        let labels: Vec<Task> = nodes.iter().map(|node| node.label.clone()).collect();
+        let labels: Vec<Task> = nodes.iter().map(|node| node.data.clone()).collect();
         assert_tasks_equal(&labels, &[(0, 0), (1, 0)]);
     }
 
@@ -91,7 +90,7 @@ mod tests {
         for task_info in tasks.iter().zip_longest(indices.iter()) {
             match task_info {
                 itertools::EitherOrBoth::Both(task, (cell_index, dir_index)) => {
-                    assert_eq!(task.cell.label, *cell_index);
+                    assert_eq!(task.cell.index, *cell_index);
                     assert_eq!(task.direction.index, *dir_index);
                 }
                 _ => {

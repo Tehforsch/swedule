@@ -31,7 +31,7 @@ impl<N, E> Graph<N, E> {
             let index_1 = label_indices.get(&index_1).unwrap();
             arena.get_mut(*index_0).unwrap().edges.push(Edge {
                 index: *index_1,
-                label: edge_data,
+                data: edge_data,
             });
         }
         Graph { arena }
@@ -39,14 +39,14 @@ impl<N, E> Graph<N, E> {
 
     pub fn node_from_index(label: N, index: Index) -> Node<N, E> {
         Node {
-            label,
+            data: label,
             index,
             edges: vec![],
         }
     }
 
     pub fn iter(&self) -> Box<dyn Iterator<Item = &N> + '_> {
-        Box::new(self.arena.iter().map(|(_, node)| &node.label))
+        Box::new(self.arena.iter().map(|(_, node)| &node.data))
     }
 
     pub fn iter_nodes(&self) -> Box<dyn Iterator<Item = &Node<N, E>> + '_> {
@@ -58,9 +58,9 @@ impl<N, E> Graph<N, E> {
         for node in self.iter_nodes() {
             for edge in node.edges.iter() {
                 edge_data.push((
-                    &node.label,
-                    &self.arena.get(edge.index).unwrap().label,
-                    &edge.label,
+                    &node.data,
+                    &self.arena.get(edge.index).unwrap().data,
+                    &edge.data,
                 ));
             }
         }
@@ -75,7 +75,7 @@ impl<N, E> Graph<N, E> {
         let mut result = vec![node];
         for edge in node.edges.iter() {
             result.extend(
-                self.traverse_depth_first(&self.arena[edge.index].label)
+                self.traverse_depth_first(&self.arena[edge.index].data)
                     .into_iter(),
             );
         }
@@ -89,7 +89,7 @@ impl<N, E> Graph<N, E> {
         self.arena
             .iter()
             .map(|(_, node)| node)
-            .find(|node| &node.label == label)
+            .find(|node| &node.data == label)
     }
 
     pub fn get(&self, index: Index) -> Option<&Node<N, E>> {
@@ -143,7 +143,7 @@ mod tests {
     fn depth_first_traversal() {
         let graph = from_node_indices(&[(0, 1), (1, 2), (2, 3), (2, 4), (2, 5)]);
         let nodes = graph.traverse_depth_first(&0);
-        let labels: Vec<usize> = nodes.iter().map(|node| node.label).collect();
+        let labels: Vec<usize> = nodes.iter().map(|node| node.data).collect();
         assert_eq!(labels, vec![0, 1, 2, 3, 4, 5]);
     }
 

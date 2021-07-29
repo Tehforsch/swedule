@@ -39,11 +39,11 @@ impl<'a> Sweep<'a> {
             if let Some(task_index) = task_index {
                 let task_node = self.graph.get(task_index).unwrap();
                 let edge_indices: Vec<Index> = task_node.edges.iter().map(|edge| edge.index).collect();
-                let task = &task_node.label;
+                let task = &task_node.data;
                 processor.solve(&task);
                 for dependency_index in edge_indices.iter() {
                     let downwind_task_node = self.graph.get_mut(*dependency_index).unwrap();
-                    let downwind_task = &mut downwind_task_node.label;
+                    let downwind_task = &mut downwind_task_node.data;
                     downwind_task.num_upwind -= 1;
                     if downwind_task.num_upwind == 0 {
                         processor.add_task_to_queue(downwind_task_node.index);
@@ -69,7 +69,7 @@ fn get_next_free_processor(processors: &mut [Processor]) -> &mut Processor {
 fn get_initial_queue<'a>(graph: &DependencyGraph<'a>, processor_num: usize) -> VecDeque<Index> {
     let mut queue = VecDeque::new();
     for task_node in graph.iter_nodes() {
-        let task = &task_node.label;
+        let task = &task_node.data;
         if task.processor_num == processor_num && task.num_upwind == 0 {
             queue.push_back(task_node.index);
         }
