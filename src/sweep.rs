@@ -2,7 +2,11 @@ use std::collections::VecDeque;
 
 use generational_arena::Index;
 
-use crate::{direction::Direction, grid::{DependencyGraph, Grid}, processor::Processor};
+use crate::{
+    direction::Direction,
+    grid::{DependencyGraph, Grid},
+    processor::Processor,
+};
 
 struct RunData {
     time: f64,
@@ -15,13 +19,13 @@ pub struct Sweep<'a> {
 
 impl<'a> Sweep<'a> {
     pub fn new(grid: &'a Grid, directions: &[Direction], num_processors: usize) -> Self {
-        let graph: DependencyGraph  = directions
+        let graph: DependencyGraph = directions
             .iter()
             .map(|dir| grid.get_dependency_graph(dir))
             .collect();
-        let processors = (0..num_processors).map(|num| Processor::new(
-            get_initial_queue(&graph, num),
-        )).collect();
+        let processors = (0..num_processors)
+            .map(|num| Processor::new(get_initial_queue(&graph, num)))
+            .collect();
         Sweep { graph, processors }
     }
 

@@ -1,4 +1,6 @@
-use crate::{cell::Cell, dependency::Dependency, direction::Direction, face::Face, graph::Graph, task::Task};
+use crate::{
+    cell::Cell, dependency::Dependency, direction::Direction, face::Face, graph::Graph, task::Task,
+};
 use ordered_float::OrderedFloat;
 
 pub type DependencyGraph<'a> = Graph<Task<'a>, Dependency>;
@@ -9,14 +11,16 @@ pub struct Grid {
 
 impl Grid {
     pub fn get_dependency_graph<'b>(&self, direction: &'b Direction) -> DependencyGraph<'_> {
-        let mut tasks: Vec<Task> = self.data.iter().map(|cell| {
-            Task {
+        let mut tasks: Vec<Task> = self
+            .data
+            .iter()
+            .map(|cell| Task {
                 cell,
                 direction: direction.clone(),
                 processor_num: cell.processor_num,
                 num_upwind: 0,
-            }
-        }).collect();
+            })
+            .collect();
         let mut dependency_data = vec![];
         for (upwind_cell, downwind_cell, face) in self.data.iter_edges() {
             if Grid::is_downwind(face, &direction) {
@@ -35,13 +39,7 @@ impl Grid {
     pub fn from_cell_pairs(cells: Vec<Cell>, pairs: &[(usize, usize)]) -> Grid {
         let edge_list: Vec<(usize, usize, Face)> = pairs
             .iter()
-            .map(|(i0, i1)| {
-                (
-                    *i0,
-                    *i1,
-                    Grid::face_between(&cells[*i0], &cells[*i1]),
-                )
-            })
+            .map(|(i0, i1)| (*i0, *i1, Grid::face_between(&cells[*i0], &cells[*i1])))
             .collect();
         Grid {
             data: Graph::from_nodes_and_edge_list(cells, edge_list),
@@ -57,8 +55,8 @@ impl Grid {
 
 #[cfg(test)]
 mod tests {
-    use itertools::Itertools;
     use crate::vector_3d::Vector3D;
+    use itertools::Itertools;
 
     use super::*;
     #[test]
@@ -101,5 +99,4 @@ mod tests {
             };
         }
     }
-
 }

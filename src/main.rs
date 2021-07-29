@@ -9,29 +9,31 @@ use grid::Grid;
 
 pub mod cell;
 pub mod command_line_args;
+pub mod dependency;
 pub mod direction;
 pub mod edge;
 pub mod face;
 pub mod graph;
 pub mod grid;
 pub mod node;
+pub mod processor;
 pub mod sweep;
 pub mod task;
 pub mod vector_3d;
-pub mod dependency;
-pub mod processor;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args = CommandLineArgs::parse();
     let grid = read_grid_file(&args.grid_file)?;
-    let directions = vec![Direction {
-        vector: Vector3D::new(1.0, 0.0, 0.0),
-        index: 0,
-    },
-   Direction {
-        vector: Vector3D::new(-1.0, 0.0, 0.0),
-        index: 0,
-    } ];
+    let directions = vec![
+        Direction {
+            vector: Vector3D::new(1.0, 0.0, 0.0),
+            index: 0,
+        },
+        Direction {
+            vector: Vector3D::new(-1.0, 0.0, 0.0),
+            index: 0,
+        },
+    ];
     let num_processors = 2;
     let mut sweep = Sweep::new(&grid, &directions, num_processors);
     sweep.run();

@@ -15,12 +15,11 @@ pub struct Graph<N, E> {
 impl<N, E> Graph<N, E> {
     fn empty() -> Graph<N, E> {
         Graph {
-            arena: Arena::new()
+            arena: Arena::new(),
         }
     }
 
-    pub fn from_nodes_and_edge_list(nodes: Vec<N>, edges: Vec<(usize, usize, E)>) -> Graph<N, E>
-    {
+    pub fn from_nodes_and_edge_list(nodes: Vec<N>, edges: Vec<(usize, usize, E)>) -> Graph<N, E> {
         let mut arena = Arena::new();
         let mut label_indices = HashMap::new();
         for (i, label) in nodes.into_iter().enumerate() {
@@ -100,7 +99,9 @@ impl<N, E> Graph<N, E> {
     fn extend(&mut self, mut graph: Graph<N, E>) {
         let mut old_index_to_new_index: HashMap<Index, Index> = HashMap::new();
         for (old_index, node) in graph.arena.drain() {
-            let new_index = self.arena.insert_with(|index| Graph::node_from_index(node.label, index));
+            let new_index = self
+                .arena
+                .insert_with(|index| Graph::node_from_index(node.label, index));
             old_index_to_new_index.insert(old_index, new_index);
         }
         for new_index in old_index_to_new_index.values() {
@@ -128,8 +129,7 @@ mod tests {
     use super::*;
     #[test]
     fn depth_first_traversal() {
-        let graph =
-            from_node_indices(&[(0, 1), (1, 2), (2, 3), (2, 4), (2, 5)]);
+        let graph = from_node_indices(&[(0, 1), (1, 2), (2, 3), (2, 4), (2, 5)]);
         let nodes = graph.traverse_depth_first(&0);
         let labels: Vec<usize> = nodes.iter().map(|node| node.label).collect();
         assert_eq!(labels, vec![0, 1, 2, 3, 4, 5]);
@@ -141,13 +141,11 @@ mod tests {
             .map(|edge| &edge.0)
             .chain(edges.iter().map(|edge| &edge.1))
             .map(|node| node.clone())
-                   .collect();
+            .collect();
         let mut nodes: Vec<usize> = nodes.into_iter().collect();
         nodes.sort();
-        let edges: Vec<(usize, usize, ())> = edges.iter().map(|edge| (edge.0, edge.1, ())).collect();
-        Graph::from_nodes_and_edge_list(
-            nodes,
-            edges,
-        )
+        let edges: Vec<(usize, usize, ())> =
+            edges.iter().map(|edge| (edge.0, edge.1, ())).collect();
+        Graph::from_nodes_and_edge_list(nodes, edges)
     }
 }

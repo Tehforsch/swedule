@@ -15,7 +15,7 @@ impl Processor {
     pub fn new(queue: TaskQueue) -> Self {
         Processor {
             queue,
-            num_solved: 0
+            num_solved: 0,
         }
     }
 
@@ -23,7 +23,7 @@ impl Processor {
         self.queue.pop_front()
     }
 
-    pub fn solve(&mut self, task_: &Task)  {
+    pub fn solve(&mut self, task_: &Task) {
         self.num_solved += 1;
     }
 }
