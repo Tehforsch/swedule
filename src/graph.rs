@@ -14,9 +14,6 @@ pub struct Graph<N, E> {
 
 impl<N, E> Graph<N, E> {
     pub fn from_nodes_and_edge_list(nodes: Vec<N>, edges: Vec<(usize, usize, E)>) -> Graph<N, E>
-    where
-        N: Eq + Hash + Sized + Clone + Debug,
-        E: Clone,
     {
         let mut arena = Arena::new();
         let mut label_indices = HashMap::new();
