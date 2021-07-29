@@ -40,7 +40,7 @@ fn read_grid_file(grid_file: &Path) -> io::Result<Grid> {
         let z = split.next().unwrap().parse::<f64>().unwrap();
         let neighbours = split.map(|num| num.parse::<usize>().unwrap());
         cells.push(Cell {
-            label: label,
+            label,
             center: Vector3D::new(x, y, z),
         });
         for neighbour in neighbours {
