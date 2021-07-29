@@ -28,6 +28,7 @@ impl Grid {
                 tasks[downwind_cell.label].num_upwind += 1;
             }
         }
+        dbg!(&dependency_data);
         Graph::from_nodes_and_edge_list(tasks, dependency_data)
     }
 

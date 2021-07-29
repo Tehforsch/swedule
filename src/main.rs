@@ -9,6 +9,7 @@ use grid::Grid;
 
 pub mod cell;
 pub mod command_line_args;
+pub mod config;
 pub mod dependency;
 pub mod direction;
 pub mod edge;
@@ -29,12 +30,8 @@ fn main() -> Result<(), Box<dyn Error>> {
             vector: Vector3D::new(1.0, 0.0, 0.0),
             index: 0,
         },
-        Direction {
-            vector: Vector3D::new(-1.0, 0.0, 0.0),
-            index: 0,
-        },
     ];
-    let num_processors = 2;
+    let num_processors = 1;
     let mut sweep = Sweep::new(&grid, &directions, num_processors);
     sweep.run();
 

@@ -96,12 +96,24 @@ impl<N, E> Graph<N, E> {
         self.arena.get(index)
     }
 
+    pub fn get_mut(&mut self, index: Index) -> Option<&mut Node<N, E>> {
+        self.arena.get_mut(index)
+    }
+
+    pub fn len(&self) -> usize {
+        self.arena.len()
+    }
+
     fn extend(&mut self, mut graph: Graph<N, E>) {
         let mut old_index_to_new_index: HashMap<Index, Index> = HashMap::new();
-        for (old_index, node) in graph.arena.drain() {
+        for (old_index, mut node) in graph.arena.drain() {
             let new_index = self
                 .arena
-                .insert_with(|index| Graph::node_from_index(node.label, index));
+                .insert_with(|index| {
+                    node.index = index;
+                    node
+                }
+                );
             old_index_to_new_index.insert(old_index, new_index);
         }
         for new_index in old_index_to_new_index.values() {
