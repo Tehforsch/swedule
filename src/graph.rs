@@ -1,7 +1,6 @@
 use std::hash::Hash;
 
-use std::fmt::Debug;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 use generational_arena::{Arena, Index};
 

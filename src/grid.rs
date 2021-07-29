@@ -1,6 +1,5 @@
 use crate::{
-    cell::Cell, direction::Direction, face::Face, graph::Graph, task::Task, vector_3d::Vector3D,
-};
+    cell::Cell, direction::Direction, face::Face, graph::Graph, task::Task};
 use ordered_float::OrderedFloat;
 
 pub struct Grid {
@@ -8,7 +7,7 @@ pub struct Grid {
 }
 
 impl Grid {
-    fn get_dependency_graph<'b>(&self, direction: &'b Direction) -> Graph<Task<'_, 'b>, ()> {
+    pub fn get_dependency_graph<'b>(&self, direction: &'b Direction) -> Graph<Task<'_, 'b>, ()> {
         let tasks: Vec<Task> = self.data.iter().map(|cell| {
             Task {
                 cell,

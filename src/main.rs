@@ -3,6 +3,7 @@ use std::{error::Error, fs, io, path::Path};
 use clap::Clap;
 
 use command_line_args::CommandLineArgs;
+use direction::Direction;
 use grid::Grid;
 use crate::{cell::Cell, vector_3d::Vector3D};
 
@@ -19,7 +20,11 @@ pub mod command_line_args;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args = CommandLineArgs::parse();
-    read_grid_file(&args.grid_file)?;
+    let grid = read_grid_file(&args.grid_file)?;
+    let graph = grid.get_dependency_graph(&Direction {
+        vector: Vector3D::new(1.0, 0.0, 0.0),
+        index: 0,
+    });
     Ok(())
 }
 
