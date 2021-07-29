@@ -1,7 +1,6 @@
 use crate::{
     cell::Cell, direction::Direction, face::Face, graph::Graph, task::Task, vector_3d::Vector3D,
 };
-use itertools::Itertools;
 use ordered_float::OrderedFloat;
 
 pub struct Grid {
@@ -10,31 +9,52 @@ pub struct Grid {
 
 impl Grid {
     fn get_dependency_graph<'b>(&self, direction: &'b Direction) -> Graph<Task<'_, 'b>, ()> {
+        let tasks: Vec<Task> = self.data.iter().map(|cell| {
+            Task {
+                cell,
+                direction
+            }
+        }).collect();
         let mut dependency_data = vec![];
         for (upwind_cell, downwind_cell, face) in self.data.iter_edges() {
             if Grid::is_downwind(face, &direction) {
-                let upwind_task = Task {
-                    cell: upwind_cell,
-                    direction,
-                };
-                let downwind_task = Task {
-                    cell: downwind_cell,
-                    direction,
-                };
-                dependency_data.push((upwind_task, downwind_task, ()));
+                dependency_data.push((upwind_cell.label, downwind_cell.label, ()));
             }
         }
-        Graph::from_edge_list(&dependency_data)
+        Graph::from_nodes_and_edge_list(tasks, dependency_data)
     }
 
     fn is_downwind(face: &Face, direction: &Direction) -> bool {
         let scalar_product = face.normal.dot(&direction.vector);
         scalar_product < OrderedFloat(0.0)
     }
+
+    pub fn from_cell_pairs(cells: Vec<Cell>, pairs: &[(usize, usize)]) -> Grid {
+        let edge_list: Vec<(usize, usize, Face)> = pairs
+            .into_iter()
+            .map(|(i0, i1)| {
+                (
+                    *i0,
+                    *i1,
+                    Grid::face_between(&cells[*i0], &cells[*i1]),
+                )
+            })
+            .collect();
+        Grid {
+            data: Graph::from_nodes_and_edge_list(cells, edge_list),
+        }
+    }
+
+    fn face_between(cell_0: &Cell, cell_1: &Cell) -> Face {
+        Face {
+            normal: (cell_0.center.sub(&cell_1.center)),
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use itertools::Itertools;
     use super::*;
     #[test]
     fn dependency_graph() {
@@ -53,7 +73,7 @@ mod tests {
             },
         ];
         let first_cell = cells[0].clone();
-        let grid = get_grid_from_cell_pairs(cells, &[(0, 1)]);
+        let grid = Grid::from_cell_pairs(cells, &[(0, 1)]);
         let graph = grid.get_dependency_graph(&direction);
         let nodes = graph.traverse_depth_first(&Task {
             cell: &first_cell,
@@ -63,7 +83,7 @@ mod tests {
         assert_tasks_equal(&labels, &[(0, 0), (1, 0)]);
     }
 
-    fn assert_tasks_equal(tasks: &[Task], indices: &[(i32, i32)]) {
+    fn assert_tasks_equal(tasks: &[Task], indices: &[(usize, usize)]) {
         for task_info in tasks.iter().zip_longest(indices.iter()) {
             match task_info {
                 itertools::EitherOrBoth::Both(task, (cell_index, dir_index)) => {
@@ -77,25 +97,4 @@ mod tests {
         }
     }
 
-    fn get_grid_from_cell_pairs(cells: Vec<Cell>, pairs: &[(usize, usize)]) -> Grid {
-        let edge_list: Vec<(Cell, Cell, Face)> = pairs
-            .into_iter()
-            .map(|(i0, i1)| {
-                (
-                    cells[*i0].clone(),
-                    cells[*i1].clone(),
-                    face_between(&cells[*i0], &cells[*i1]),
-                )
-            })
-            .collect();
-        Grid {
-            data: Graph::from_edge_list(&edge_list),
-        }
-    }
-
-    fn face_between(cell_0: &Cell, cell_1: &Cell) -> Face {
-        Face {
-            normal: (cell_0.center.sub(&cell_1.center)),
-        }
-    }
 }

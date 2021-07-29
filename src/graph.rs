@@ -1,6 +1,7 @@
 use std::hash::Hash;
 
-use std::collections::HashSet;
+use std::fmt::Debug;
+use std::collections::{HashMap, HashSet};
 
 use generational_arena::{Arena, Index};
 
@@ -12,48 +13,26 @@ pub struct Graph<N, E> {
 }
 
 impl<N, E> Graph<N, E> {
-    pub fn from_nodes_and_edge_list(nodes: Vec<N>, edges: &[(N, N, E)]) -> Graph<N, E>
+    pub fn from_nodes_and_edge_list(nodes: Vec<N>, edges: Vec<(usize, usize, E)>) -> Graph<N, E>
     where
-        N: Eq + Hash + Sized,
+        N: Eq + Hash + Sized + Clone + Debug,
         E: Clone,
     {
         let mut arena = Arena::new();
-        for label in nodes.into_iter() {
-            arena.insert_with(|index| Graph::node_from_index(label, index));
+        let mut label_indices = HashMap::new();
+        for (i, label) in nodes.into_iter().enumerate() {
+            let index = arena.insert_with(|index| Graph::node_from_index(label, index));
+            label_indices.insert(i, index);
         }
-        for (label_0, label_1, edge_data) in edges {
-            let index_0 = arena
-                .iter()
-                .find(|(_, node)| node.label == *label_0)
-                .map(|(index, _)| index)
-                .unwrap();
-            let index_1 = arena
-                .iter()
-                .find(|(_, node)| node.label == *label_1)
-                .map(|(index, _)| index)
-                .unwrap();
-            arena.get_mut(index_0).unwrap().edges.push(Edge {
-                index: index_1,
-                label: edge_data.clone(),
+        for (index_0, index_1, edge_data) in edges.into_iter() {
+            let index_0 = label_indices.get(&index_0).unwrap();
+            let index_1 = label_indices.get(&index_1).unwrap();
+            arena.get_mut(*index_0).unwrap().edges.push(Edge {
+                index: *index_1,
+                label: edge_data,
             });
         }
         Graph { arena }
-    }
-
-    pub fn from_edge_list(edges: &[(N, N, E)]) -> Graph<N, E>
-    where
-        N: Hash + Eq + Clone,
-        E: Clone,
-    {
-        let mut nodes: HashSet<N> = HashSet::new();
-        for label in edges
-            .iter()
-            .map(|edge| edge.0.clone())
-            .chain(edges.iter().map(|edge| edge.1.clone()))
-        {
-            nodes.insert(label);
-        }
-        Graph::from_nodes_and_edge_list(nodes.into_iter().collect(), edges)
     }
 
     pub fn node_from_index(label: N, index: Index) -> Node<N, E> {
@@ -118,9 +97,25 @@ mod tests {
     #[test]
     fn depth_first_traversal() {
         let graph =
-            Graph::from_edge_list(&[(1, 2, ()), (2, 3, ()), (3, 4, ()), (3, 5, ()), (3, 6, ())]);
-        let nodes = graph.traverse_depth_first(&1);
-        let labels: Vec<i32> = nodes.iter().map(|node| node.label).collect();
-        assert_eq!(labels, vec![1, 2, 3, 4, 5, 6]);
+            from_node_indices(&[(0, 1), (1, 2), (2, 3), (2, 4), (2, 5)]);
+        let nodes = graph.traverse_depth_first(&0);
+        let labels: Vec<usize> = nodes.iter().map(|node| node.label).collect();
+        assert_eq!(labels, vec![0, 1, 2, 3, 4, 5]);
+    }
+
+    fn from_node_indices(edges: &[(usize, usize)]) -> Graph<usize, ()> {
+        let nodes: HashSet<usize> = edges
+            .iter()
+            .map(|edge| &edge.0)
+            .chain(edges.iter().map(|edge| &edge.1))
+            .map(|node| node.clone())
+                   .collect();
+        let mut nodes: Vec<usize> = nodes.into_iter().collect();
+        nodes.sort();
+        let edges: Vec<(usize, usize, ())> = edges.iter().map(|edge| (edge.0, edge.1, ())).collect();
+        Graph::from_nodes_and_edge_list(
+            nodes,
+            edges,
+        )
     }
 }
