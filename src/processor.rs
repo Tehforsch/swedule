@@ -23,7 +23,7 @@ impl Processor {
         self.queue.pop_front()
     }
 
-    pub fn solve(&mut self, task_: &Task) {
+    pub fn solve(&mut self, _task: &Task) {
         self.num_solved += 1;
     }
 }
