@@ -1,6 +1,7 @@
 use std::hash::Hash;
 
 use std::collections::HashMap;
+use std::iter::FromIterator;
 
 use generational_arena::{Arena, Index};
 
@@ -12,6 +13,12 @@ pub struct Graph<N, E> {
 }
 
 impl<N, E> Graph<N, E> {
+    fn empty() -> Graph<N, E> {
+        Graph {
+            arena: Arena::new()
+        }
+    }
+
     pub fn from_nodes_and_edge_list(nodes: Vec<N>, edges: Vec<(usize, usize, E)>) -> Graph<N, E>
     {
         let mut arena = Arena::new();
@@ -43,7 +50,7 @@ impl<N, E> Graph<N, E> {
         Box::new(self.arena.iter().map(|(_, node)| &node.label))
     }
 
-    fn iter_nodes(&self) -> Box<dyn Iterator<Item = &Node<N, E>> + '_> {
+    pub fn iter_nodes(&self) -> Box<dyn Iterator<Item = &Node<N, E>> + '_> {
         Box::new(self.arena.iter().map(|(_, node)| node))
     }
 
@@ -84,6 +91,33 @@ impl<N, E> Graph<N, E> {
             .iter()
             .map(|(_, node)| node)
             .find(|node| &node.label == label)
+    }
+
+    pub fn get(&self, index: Index) -> Option<&Node<N, E>> {
+        self.arena.get(index)
+    }
+
+    fn extend(&mut self, mut graph: Graph<N, E>) {
+        let mut old_index_to_new_index: HashMap<Index, Index> = HashMap::new();
+        for (old_index, node) in graph.arena.drain() {
+            let new_index = self.arena.insert_with(|index| Graph::node_from_index(node.label, index));
+            old_index_to_new_index.insert(old_index, new_index);
+        }
+        for new_index in old_index_to_new_index.values() {
+            for edge in self.arena[*new_index].edges.iter_mut() {
+                edge.index = old_index_to_new_index[&edge.index];
+            }
+        }
+    }
+}
+
+impl<N, E> FromIterator<Graph<N, E>> for Graph<N, E> {
+    fn from_iter<T: IntoIterator<Item = Graph<N, E>>>(iter: T) -> Self {
+        let mut graph = Graph::empty();
+        for disjoint_subgraph in iter {
+            graph.extend(disjoint_subgraph);
+        }
+        graph
     }
 }
 

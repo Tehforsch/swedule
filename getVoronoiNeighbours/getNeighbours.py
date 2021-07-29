@@ -28,6 +28,7 @@ class Cell:
     def __init__(self, pos: np.ndarray):
         self.pos = pos
         self.neighbours = []
+        self.processor = 0 if pos[0] < 0.5 else 1
 
     def __repr__(self):
         return "{}@{}".format(self.pos)
@@ -87,7 +88,7 @@ def readFile(filename: Path):
 def writeGridToFile(filename: str, grid: Grid):
     def writeCell(cell):
         formattedNeighbours = " ".join(str(neighbour.name) for neighbour in cell.neighbours)
-        return "{} {} {} {} {}".format(cell.name, cell.pos[0], cell.pos[1], cell.pos[2], formattedNeighbours)
+        return "{} {} {} {} {} {}".format(cell.name, cell.processor, cell.pos[0], cell.pos[1], cell.pos[2], formattedNeighbours)
 
     content = "\n".join(writeCell(cell) for cell in grid.cells)
     with open(filename, "w") as f:

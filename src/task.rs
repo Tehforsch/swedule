@@ -1,7 +1,9 @@
 use crate::{cell::Cell, direction::Direction};
 
-#[derive(Hash, PartialEq, Eq, Clone, Copy, Debug)]
-pub struct Task<'a, 'b> {
+#[derive(Hash, PartialEq, Eq, Clone, Debug)]
+pub struct Task<'a> {
     pub cell: &'a Cell,
-    pub direction: &'b Direction,
+    pub direction: Direction,
+    pub processor_num: usize,
+    pub num_upwind: usize,
 }

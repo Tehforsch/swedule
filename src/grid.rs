@@ -1,23 +1,27 @@
-use crate::{
-    cell::Cell, direction::Direction, face::Face, graph::Graph, task::Task};
+use crate::{cell::Cell, dependency::Dependency, direction::Direction, face::Face, graph::Graph, task::Task};
 use ordered_float::OrderedFloat;
+
+pub type DependencyGraph<'a> = Graph<Task<'a>, Dependency>;
 
 pub struct Grid {
     data: Graph<Cell, Face>,
 }
 
 impl Grid {
-    pub fn get_dependency_graph<'b>(&self, direction: &'b Direction) -> Graph<Task<'_, 'b>, ()> {
-        let tasks: Vec<Task> = self.data.iter().map(|cell| {
+    pub fn get_dependency_graph<'b>(&self, direction: &'b Direction) -> DependencyGraph<'_> {
+        let mut tasks: Vec<Task> = self.data.iter().map(|cell| {
             Task {
                 cell,
-                direction
+                direction: direction.clone(),
+                processor_num: cell.processor_num,
+                num_upwind: 0,
             }
         }).collect();
         let mut dependency_data = vec![];
         for (upwind_cell, downwind_cell, face) in self.data.iter_edges() {
             if Grid::is_downwind(face, &direction) {
-                dependency_data.push((upwind_cell.label, downwind_cell.label, ()));
+                dependency_data.push((upwind_cell.label, downwind_cell.label, Dependency));
+                tasks[downwind_cell.label].num_upwind += 1;
             }
         }
         Graph::from_nodes_and_edge_list(tasks, dependency_data)

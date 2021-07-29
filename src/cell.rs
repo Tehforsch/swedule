@@ -4,6 +4,7 @@ use crate::vector_3d::Vector3D;
 pub struct Cell {
     pub center: Vector3D,
     pub label: usize,
+    pub processor_num: usize,
 }
 
 impl Eq for Cell {

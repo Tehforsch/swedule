@@ -2,29 +2,40 @@ use std::{error::Error, fs, io, path::Path};
 
 use clap::Clap;
 
+use crate::{cell::Cell, sweep::Sweep, vector_3d::Vector3D};
 use command_line_args::CommandLineArgs;
 use direction::Direction;
 use grid::Grid;
-use crate::{cell::Cell, vector_3d::Vector3D};
 
 pub mod cell;
+pub mod command_line_args;
 pub mod direction;
 pub mod edge;
 pub mod face;
 pub mod graph;
 pub mod grid;
 pub mod node;
+pub mod sweep;
 pub mod task;
 pub mod vector_3d;
-pub mod command_line_args;
+pub mod dependency;
+pub mod processor;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args = CommandLineArgs::parse();
     let grid = read_grid_file(&args.grid_file)?;
-    let graph = grid.get_dependency_graph(&Direction {
+    let directions = vec![Direction {
         vector: Vector3D::new(1.0, 0.0, 0.0),
         index: 0,
-    });
+    },
+   Direction {
+        vector: Vector3D::new(-1.0, 0.0, 0.0),
+        index: 0,
+    } ];
+    let num_processors = 2;
+    let mut sweep = Sweep::new(&grid, &directions, num_processors);
+    sweep.run();
+
     Ok(())
 }
 
@@ -35,13 +46,16 @@ fn read_grid_file(grid_file: &Path) -> io::Result<Grid> {
     for line in contents.lines() {
         let mut split = line.split_ascii_whitespace();
         let label = split.next().unwrap().parse::<usize>().unwrap();
+        let processor_num = split.next().unwrap().parse::<usize>().unwrap();
         let x = split.next().unwrap().parse::<f64>().unwrap();
         let y = split.next().unwrap().parse::<f64>().unwrap();
         let z = split.next().unwrap().parse::<f64>().unwrap();
         let neighbours = split.map(|num| num.parse::<usize>().unwrap());
+        let center = Vector3D::new(x, y, z);
         cells.push(Cell {
             label,
-            center: Vector3D::new(x, y, z),
+            center,
+            processor_num,
         });
         for neighbour in neighbours {
             edges.push((label, neighbour));
@@ -49,4 +63,3 @@ fn read_grid_file(grid_file: &Path) -> io::Result<Grid> {
     }
     Ok(Grid::from_cell_pairs(cells, &edges))
 }
-
