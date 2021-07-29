@@ -89,6 +89,8 @@ impl<N, E> Graph<N, E> {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashSet;
+
     use super::*;
     #[test]
     fn depth_first_traversal() {

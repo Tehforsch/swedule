@@ -54,6 +54,8 @@ impl Grid {
 #[cfg(test)]
 mod tests {
     use itertools::Itertools;
+    use crate::vector_3d::Vector3D;
+
     use super::*;
     #[test]
     fn dependency_graph() {
