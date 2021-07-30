@@ -56,6 +56,7 @@ impl<'a> Sweep<'a> {
                 .map(|processor| processor.time)
                 .max()
                 .unwrap(),
+            num_processors: self.processors.len(),
         }
     }
 

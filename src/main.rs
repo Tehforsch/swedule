@@ -7,7 +7,7 @@ use crate::{
     cell::Cell, domain_decomposition::do_domain_decomposition, sweep::Sweep, vector_3d::Vector3D,
 };
 use command_line_args::CommandLineArgs;
-use direction::Direction;
+use direction::{get_equally_distributed_directions_on_sphere, Direction};
 use grid::Grid;
 
 pub mod cell;
@@ -30,23 +30,20 @@ pub mod vector_3d;
 fn main() -> Result<(), Box<dyn Error>> {
     let args = CommandLineArgs::parse();
     let mut grid = read_grid_file(&args.grid_file)?;
-    let mut time_on_one_processor = 0.0;
     let num_directions = 4;
-    // let directions = get_equally_distributed_directions_on_sphere(num_directions);
-    let directions = vec![Direction {
-        vector: Vector3D::new(1.0, 0.0, 0.0),
-        index: 0,
-    }];
-    for num_processors in 25..26 {
-        let run_data = run_sweep_on_processors(&mut grid, &directions, num_processors);
-        if num_processors == 1 {
-            time_on_one_processor = run_data.time
-        }
+    let directions = get_equally_distributed_directions_on_sphere(num_directions);
+    let min_num_processors = 1;
+    let max_num_processors = 20;
+    let run_data_list: Vec<RunData> = (min_num_processors..max_num_processors)
+        .map(|num_processors| run_sweep_on_processors(&mut grid, &directions, num_processors))
+        .collect();
+    let reference = &run_data_list[0];
+    for run_data in run_data_list.iter() {
         println!(
             "{}: {} (speedup: {:.2})",
-            num_processors,
+            run_data.num_processors,
             run_data.time,
-            run_data.get_speedup(time_on_one_processor)
+            run_data.get_speedup(&reference)
         );
     }
 

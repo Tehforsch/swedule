@@ -1,9 +1,10 @@
 pub struct RunData {
     pub time: f64,
+    pub num_processors: usize,
 }
 
 impl RunData {
-    pub fn get_speedup(&self, reference_time: f64) -> f64 {
-        reference_time / self.time
+    pub fn get_speedup(&self, reference: &RunData) -> f64 {
+        reference.time / self.time
     }
 }

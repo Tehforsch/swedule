@@ -16,6 +16,14 @@ impl Vector3D {
         }
     }
 
+    pub fn from_spherical_angles(theta: f64, phi: f64) -> Vector3D {
+        Vector3D::new(
+            theta.sin() * phi.cos(),
+            theta.sin() * phi.sin(),
+            theta.cos(),
+        )
+    }
+
     pub fn sub(&self, other: &Vector3D) -> Vector3D {
         Vector3D {
             x: self.x - other.x,

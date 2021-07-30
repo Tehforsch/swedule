@@ -22,10 +22,6 @@ pub fn do_domain_decomposition(grid: &mut Grid, num_processors: usize) {
         let cell = grid.get_cell_by_index_mut(cell_index);
         cell.processor_num = current_processor;
         current_weight += weight_per_cell;
-        println!(
-            "{} {} {} {}",
-            cell.center.x, cell.center.y, cell.center.z, current_processor
-        );
         if current_weight > weight_per_processor {
             current_weight = 0.0;
             current_processor += 1;
