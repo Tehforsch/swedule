@@ -18,6 +18,8 @@ pub struct Processor {
     pub time: OrderedFloat<f64>,
     pub num: usize,
     pub asleep: bool,
+    pub time_spent_communicating: f64,
+    pub time_spent_waiting: f64,
 }
 
 impl Processor {
@@ -30,6 +32,8 @@ impl Processor {
             num_solved: 0,
             time: OrderedFloat(0.0),
             asleep: false,
+            time_spent_waiting: 0.0,
+            time_spent_communicating: 0.0,
         }
     }
 
@@ -40,23 +44,20 @@ impl Processor {
     pub fn solve(&mut self, _task: &Task) {
         self.num_solved += 1;
         self.time += config::SOLVE_TIME;
-        // println!("{} solv {}", self.num, _task.cell.index);
     }
 
     pub fn send_tasks(&mut self) -> SendQueue {
-        self.time += config::SEND_TIME;
-        // for task in self.send_queue.iter() {
-        // println!("{} send {:?}", self.num, task.1);
-        // }
+        let send_time = config::SEND_TIME;
+        self.time_spent_communicating += send_time;
+        self.time += send_time;
         self.send_queue.drain(..).collect()
     }
 
     pub fn receive_tasks(&mut self) -> usize {
-        self.time += config::RECEIVE_TIME;
+        let receive_time = config::RECEIVE_TIME;
+        self.time_spent_communicating += receive_time;
+        self.time += receive_time;
         let num_received = self.receive_queue.len();
-        // for task in self.receive_queue.iter() {
-        // println!("{} recv {:?}", self.num, task);
-        // }
         self.queue.append(&mut self.receive_queue);
         num_received
     }
@@ -79,6 +80,7 @@ impl Processor {
 
     pub fn wake_up(&mut self, time: OrderedFloat<f64>) {
         if self.asleep {
+            self.time_spent_waiting += *time - *self.time;
             self.time = time;
             self.asleep = false;
         }

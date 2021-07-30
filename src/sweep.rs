@@ -49,15 +49,7 @@ impl<'a> Sweep<'a> {
                 break;
             }
         }
-        RunData {
-            time: *self
-                .processors
-                .iter()
-                .map(|processor| processor.time)
-                .max()
-                .unwrap(),
-            num_processors: self.processors.len(),
-        }
+        RunData::new(&self.processors)
     }
 
     pub fn get_num_solved(&self) -> usize {
