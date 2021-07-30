@@ -30,7 +30,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         vector: Vector3D::new(1.0, 0.0, 0.0),
         index: 0,
     }];
-    let num_processors = 1;
+    let num_processors = 2;
     let mut sweep = Sweep::new(&grid, &directions, num_processors);
     let run_data = sweep.run();
     dbg!(run_data.time);
