@@ -1,6 +1,8 @@
 use crate::{
-    cell::Cell, dependency::Dependency, direction::Direction, face::Face, graph::Graph, task::Task,
+    cell::Cell, dependency::Dependency, direction::Direction, face::Face, graph::Graph, node::Node,
+    task::Task,
 };
+use generational_arena::Index;
 use ordered_float::OrderedFloat;
 
 pub type DependencyGraph<'a> = Graph<Task<'a>, Dependency>;
@@ -51,6 +53,18 @@ impl Grid {
             normal: (cell_0.center.sub(&cell_1.center)),
         }
     }
+
+    pub fn iter(&self) -> Box<dyn Iterator<Item = &Cell> + '_> {
+        self.data.iter()
+    }
+
+    pub fn iter_nodes(&self) -> Box<dyn Iterator<Item = &Node<Cell, Face>> + '_> {
+        self.data.iter_nodes()
+    }
+
+    pub fn get_cell_by_index_mut(&mut self, index: Index) -> &mut Cell {
+        &mut self.data.get_mut(index).unwrap().data
+    }
 }
 
 #[cfg(test)]
@@ -69,10 +83,12 @@ mod tests {
             Cell {
                 index: 0,
                 center: Vector3D::new(0., 0., 0.),
+                processor_num: 0,
             },
             Cell {
                 index: 1,
                 center: Vector3D::new(1., 0., 0.),
+                processor_num: 0,
             },
         ];
         let first_cell = cells[0].clone();
@@ -80,7 +96,9 @@ mod tests {
         let graph = grid.get_dependency_graph(&direction);
         let nodes = graph.traverse_depth_first(&Task {
             cell: &first_cell,
-            direction: &direction,
+            direction,
+            processor_num: 0,
+            num_upwind: 0,
         });
         let labels: Vec<Task> = nodes.iter().map(|node| node.data.clone()).collect();
         assert_tasks_equal(&labels, &[(0, 0), (1, 0)]);

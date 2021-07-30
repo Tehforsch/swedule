@@ -2,7 +2,12 @@ use std::collections::VecDeque;
 
 use generational_arena::Index;
 
-use crate::{direction::Direction, grid::{DependencyGraph, Grid}, processor::Processor, run_data::RunData};
+use crate::{
+    direction::Direction,
+    grid::{DependencyGraph, Grid},
+    processor::Processor,
+    run_data::RunData,
+};
 
 pub struct Sweep<'a> {
     graph: DependencyGraph<'a>,
@@ -45,23 +50,30 @@ impl<'a> Sweep<'a> {
             }
         }
         RunData {
-            time: *self.processors.iter().map(|processor| processor.time).max().unwrap()
+            time: *self
+                .processors
+                .iter()
+                .map(|processor| processor.time)
+                .max()
+                .unwrap(),
         }
     }
 
     pub fn get_num_solved(&self) -> usize {
-        self
-            .processors
+        self.processors
             .iter()
             .map(|processor| processor.num_solved)
             .sum()
     }
 }
 
-fn handle_task_solving<'a>(graph: &mut DependencyGraph<'a>, processor: &mut Processor, task_index: Index) -> () {
+fn handle_task_solving<'a>(
+    graph: &mut DependencyGraph<'a>,
+    processor: &mut Processor,
+    task_index: Index,
+) -> () {
     let task_node = graph.get(task_index).unwrap();
-    let edge_indices: Vec<Index> =
-        task_node.edges.iter().map(|edge| edge.index).collect();
+    let edge_indices: Vec<Index> = task_node.edges.iter().map(|edge| edge.index).collect();
     let task = &task_node.data;
     processor.solve(&task);
     for dependency_index in edge_indices.iter() {
@@ -71,9 +83,9 @@ fn handle_task_solving<'a>(graph: &mut DependencyGraph<'a>, processor: &mut Proc
         if downwind_task.num_upwind == 0 {
             if downwind_task.processor_num == processor.num {
                 processor.add_task_to_queue(downwind_task_node.index);
-            }
-            else {
-                processor.add_task_to_send_queue(downwind_task_node.index, downwind_task.processor_num);
+            } else {
+                processor
+                    .add_task_to_send_queue(downwind_task_node.index, downwind_task.processor_num);
             }
         }
     }

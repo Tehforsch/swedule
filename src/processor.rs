@@ -46,7 +46,7 @@ impl Processor {
     pub fn send_tasks(&mut self) -> SendQueue {
         self.time += config::SEND_TIME;
         // for task in self.send_queue.iter() {
-            // println!("{} send {:?}", self.num, task.1);
+        // println!("{} send {:?}", self.num, task.1);
         // }
         self.send_queue.drain(..).collect()
     }
@@ -55,7 +55,7 @@ impl Processor {
         self.time += config::RECEIVE_TIME;
         let num_received = self.receive_queue.len();
         // for task in self.receive_queue.iter() {
-            // println!("{} recv {:?}", self.num, task);
+        // println!("{} recv {:?}", self.num, task);
         // }
         self.queue.append(&mut self.receive_queue);
         num_received

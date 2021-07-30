@@ -2,9 +2,9 @@ use ordered_float::OrderedFloat;
 
 #[derive(Hash, PartialEq, Eq, Clone, Debug)]
 pub struct Vector3D {
-    x: OrderedFloat<f64>,
-    y: OrderedFloat<f64>,
-    z: OrderedFloat<f64>,
+    pub x: OrderedFloat<f64>,
+    pub y: OrderedFloat<f64>,
+    pub z: OrderedFloat<f64>,
 }
 
 impl Vector3D {

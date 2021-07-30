@@ -1,8 +1,11 @@
 use std::{error::Error, fs, io, path::Path};
 
 use clap::Clap;
+use run_data::RunData;
 
-use crate::{cell::Cell, sweep::Sweep, vector_3d::Vector3D};
+use crate::{
+    cell::Cell, domain_decomposition::do_domain_decomposition, sweep::Sweep, vector_3d::Vector3D,
+};
 use command_line_args::CommandLineArgs;
 use direction::Direction;
 use grid::Grid;
@@ -12,30 +15,52 @@ pub mod command_line_args;
 pub mod config;
 pub mod dependency;
 pub mod direction;
+pub mod domain_decomposition;
 pub mod edge;
 pub mod face;
 pub mod graph;
 pub mod grid;
 pub mod node;
 pub mod processor;
+pub mod run_data;
 pub mod sweep;
 pub mod task;
 pub mod vector_3d;
-pub mod run_data;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args = CommandLineArgs::parse();
-    let grid = read_grid_file(&args.grid_file)?;
+    let mut grid = read_grid_file(&args.grid_file)?;
+    let mut time_on_one_processor = 0.0;
+    let num_directions = 4;
+    // let directions = get_equally_distributed_directions_on_sphere(num_directions);
     let directions = vec![Direction {
         vector: Vector3D::new(1.0, 0.0, 0.0),
         index: 0,
     }];
-    let num_processors = 2;
-    let mut sweep = Sweep::new(&grid, &directions, num_processors);
-    let run_data = sweep.run();
-    dbg!(run_data.time);
+    for num_processors in 25..26 {
+        let run_data = run_sweep_on_processors(&mut grid, &directions, num_processors);
+        if num_processors == 1 {
+            time_on_one_processor = run_data.time
+        }
+        println!(
+            "{}: {} (speedup: {:.2})",
+            num_processors,
+            run_data.time,
+            run_data.get_speedup(time_on_one_processor)
+        );
+    }
 
     Ok(())
+}
+
+fn run_sweep_on_processors(
+    mut grid: &mut Grid,
+    directions: &[Direction],
+    num_processors: usize,
+) -> RunData {
+    do_domain_decomposition(&mut grid, num_processors);
+    let mut sweep = Sweep::new(&grid, &directions, num_processors);
+    sweep.run()
 }
 
 fn read_grid_file(grid_file: &Path) -> io::Result<Grid> {
