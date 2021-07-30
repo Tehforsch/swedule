@@ -25,10 +25,18 @@ pub fn get_equally_distributed_directions_on_sphere(num_directions: usize) -> Ve
         }
     }
     if points.len() != num_directions {
-        println!("Could not equally distribute {} points on a sphere - returned {} instead", num_directions, points.len());
+        println!(
+            "Could not equally distribute {} points on a sphere - returned {} instead",
+            num_directions,
+            points.len()
+        );
     }
-    points.into_iter().enumerate().map(|(i, point)| Direction {
-        vector: point,
-        index: i
-    }).collect()
+    points
+        .into_iter()
+        .enumerate()
+        .map(|(i, point)| Direction {
+            vector: point,
+            index: i,
+        })
+        .collect()
 }
