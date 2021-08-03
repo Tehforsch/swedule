@@ -100,7 +100,7 @@ def main():
     boxSize, coordinates = readFile(filename)
     domain = Domain((0, boxSize), (0, boxSize), (0, boxSize))
     grid = getVoronoiGrid(coordinates, domain)
-    outFile = filename.replace("hdf5", "txt")
+    outFile = filename.replace("hdf5", "dat")
     writeGridToFile(outFile, grid)
 
 
