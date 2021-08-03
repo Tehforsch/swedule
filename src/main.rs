@@ -30,12 +30,12 @@ pub mod vector_3d;
 fn main() -> Result<(), Box<dyn Error>> {
     let args = CommandLineArgs::parse();
     let mut grid = read_grid_file(&args.grid_file)?;
-    let num_directions = 4;
+    let num_directions = 84;
     let directions = get_equally_distributed_directions_on_sphere(num_directions);
-    let min_num_processors = 1;
-    let max_num_processors = 20;
-    let run_data_list: Vec<RunData> = (min_num_processors..max_num_processors)
-        .map(|num_processors| run_sweep_on_processors(&mut grid, &directions, num_processors))
+    let processors = [1, 2, 4, 8, 16, 32, 64, 128];
+    let run_data_list: Vec<RunData> = processors
+        .iter()
+        .map(|num_processors| run_sweep_on_processors(&mut grid, &directions, *num_processors))
         .collect();
     let reference = &run_data_list[0];
     for run_data in run_data_list.iter() {
@@ -57,6 +57,7 @@ fn run_sweep_on_processors(
     directions: &[Direction],
     num_processors: usize,
 ) -> RunData {
+    println!("Running on {}", num_processors);
     do_domain_decomposition(&mut grid, num_processors);
     let mut sweep = Sweep::new(&grid, &directions, num_processors);
     sweep.run()

@@ -27,9 +27,9 @@ impl RunData {
             / num_processors as f64;
         RunData {
             time,
+            num_processors,
             time_spent_communicating,
             time_spent_waiting,
-            num_processors,
         }
     }
 

@@ -64,7 +64,7 @@ fn handle_task_solving<'a>(
     graph: &mut DependencyGraph<'a>,
     processor: &mut Processor,
     task_index: Index,
-) -> () {
+) {
     let task_node = graph.get(task_index).unwrap();
     let edge_indices: Vec<Index> = task_node.edges.iter().map(|edge| edge.index).collect();
     let task = &task_node.data;
@@ -92,7 +92,7 @@ fn get_next_free_processor(processors: &mut [Processor]) -> &mut Processor {
         .unwrap()
 }
 
-fn get_initial_queue<'a>(graph: &DependencyGraph<'a>, processor_num: usize) -> VecDeque<Index> {
+fn get_initial_queue(graph: &DependencyGraph, processor_num: usize) -> VecDeque<Index> {
     let mut queue = VecDeque::new();
     for task_node in graph.iter_nodes() {
         let task = &task_node.data;
