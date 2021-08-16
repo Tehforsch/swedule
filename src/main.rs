@@ -40,7 +40,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let reference = &run_data_list[0];
     for run_data in run_data_list.iter() {
         println!(
-            "{}: {} (speedup: {:.2}) comm: {}, idle: {}",
+            "{:>4}: Time: {:.3} (speedup: {:>6.2}), comm: {:.3}, idle: {:.3}",
             run_data.num_processors,
             run_data.time,
             run_data.get_speedup(&reference),
