@@ -3,7 +3,8 @@ use std::collections::VecDeque;
 use generational_arena::Index;
 use ordered_float::OrderedFloat;
 
-use crate::{config, task::Task};
+use crate::task::Task;
+use crate::config::*;
 
 type TaskQueue = VecDeque<Index>;
 type SendQueue = VecDeque<(usize, Index)>;
@@ -43,23 +44,32 @@ impl Processor {
 
     pub fn solve(&mut self, _task: &Task) {
         self.num_solved += 1;
-        self.time += config::SOLVE_TIME;
+        self.time += SOLVE_TIME;
     }
 
     pub fn send_tasks(&mut self) -> SendQueue {
-        let send_time = config::SEND_TIME;
+        let sent_tasks: SendQueue = self.send_queue.drain(..).collect();
+        let send_time = self.get_send_time(sent_tasks.len());
         self.time_spent_communicating += send_time;
         self.time += send_time;
-        self.send_queue.drain(..).collect()
+        sent_tasks
     }
 
     pub fn receive_tasks(&mut self) -> usize {
-        let receive_time = config::RECEIVE_TIME;
+        let num_received = self.receive_queue.len();
+        let receive_time = self.get_receive_time(num_received);
         self.time_spent_communicating += receive_time;
         self.time += receive_time;
-        let num_received = self.receive_queue.len();
         self.queue.append(&mut self.receive_queue);
         num_received
+    }
+
+    fn get_send_time(&self, num_sent: usize) -> f64 {
+        SEND_TIME_OFFSET_SECONDS + num_sent as f64 * SEND_TIME_PER_BYTE_SECONDS * SIZE_PER_MESSAGE
+    }
+
+    fn get_receive_time(&self, num_received: usize) -> f64 {
+        self.get_send_time(num_received)
     }
 
     pub fn add_task_to_queue(&mut self, task_index: Index) {
