@@ -29,14 +29,13 @@ pub mod vector_3d;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args = CommandLineArgs::parse();
-    let mut grid = read_grid_file(&args.grid_file)?;
-    let num_directions = 84;
-    let directions = get_equally_distributed_directions_on_sphere(num_directions);
-    let processors = [1, 2, 4, 8, 16, 32, 64, 128];
-    let run_data_list: Vec<RunData> = processors
-        .iter()
-        .map(|num_processors| run_sweep_on_processors(&mut grid, &directions, *num_processors))
-        .collect();
+    let directions = get_equally_distributed_directions_on_sphere(config::NUM_DIRECTIONS);
+    let mut run_data_list = vec![];
+    for grid_file in args.grid_files.iter() {
+        let mut grid = read_grid_file(grid_file)?;
+        let run_data = run_sweep_on_processors(&mut grid, &directions);
+        run_data_list.push(run_data);
+    }
     let reference = &run_data_list[0];
     for run_data in run_data_list.iter() {
         println!(
@@ -49,17 +48,25 @@ fn main() -> Result<(), Box<dyn Error>> {
             run_data.time_spent_waiting / run_data.time,
         );
     }
-
     Ok(())
 }
 
-fn run_sweep_on_processors(
+fn _run_sweep_and_domain_decomposition_on_processors(
     mut grid: &mut Grid,
     directions: &[Direction],
     num_processors: usize,
 ) -> RunData {
     println!("Running on {}", num_processors);
     do_domain_decomposition(&mut grid, num_processors);
+    let mut sweep = Sweep::new(&grid, &directions, num_processors);
+    sweep.run()
+}
+
+fn run_sweep_on_processors(
+    grid: &mut Grid,
+    directions: &[Direction],
+) -> RunData {
+    let num_processors = grid.iter().map(|cell| cell.processor_num).max().unwrap() + 1;
     let mut sweep = Sweep::new(&grid, &directions, num_processors);
     sweep.run()
 }
