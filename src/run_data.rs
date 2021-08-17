@@ -36,4 +36,8 @@ impl RunData {
     pub fn get_speedup(&self, reference: &RunData) -> f64 {
         reference.time / self.time
     }
+
+    pub fn get_efficiency(&self, reference: &RunData) -> f64 {
+        reference.time / self.time / (self.num_processors as f64 / reference.num_processors as f64)
+    }
 }
