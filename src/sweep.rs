@@ -1,4 +1,4 @@
-use std::collections::{VecDeque};
+use std::collections::VecDeque;
 
 use generational_arena::Index;
 
@@ -93,8 +93,8 @@ fn get_next_free_processor(processors: &mut [Processor]) -> &mut Processor {
 
 fn get_processors(graph: &DependencyGraph, num_processors: usize) -> Vec<Processor> {
     let mut processors: Vec<Processor> = (0..num_processors)
-                .map(|num| Processor::new(num, VecDeque::new()))
-                .collect();
+        .map(|num| Processor::new(num, VecDeque::new()))
+        .collect();
     for task_node in graph.iter_nodes() {
         let task = &task_node.data;
         if task.num_upwind == 0 {

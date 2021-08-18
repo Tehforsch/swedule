@@ -3,8 +3,8 @@ use std::collections::VecDeque;
 use generational_arena::Index;
 use ordered_float::OrderedFloat;
 
-use crate::task::Task;
 use crate::config::*;
+use crate::task::Task;
 
 type TaskQueue = VecDeque<Index>;
 type SendQueue = VecDeque<(usize, Index)>;

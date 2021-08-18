@@ -1,5 +1,5 @@
-use std::error::Error;
 use clap::Clap;
+use std::error::Error;
 use swedule::command_line_args::CommandLineArgs;
 use swedule::run::run;
 

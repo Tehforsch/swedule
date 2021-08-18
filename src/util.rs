@@ -1,5 +1,10 @@
-use std::{ffi::OsStr, fmt::Display, path::Path, process::{Command, Stdio}};
 use std::str;
+use std::{
+    ffi::OsStr,
+    fmt::Display,
+    path::Path,
+    process::{Command, Stdio},
+};
 
 #[derive(Debug)]
 pub struct ShellCommandOutput {
