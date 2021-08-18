@@ -31,7 +31,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     let args = CommandLineArgs::parse();
     let directions = get_equally_distributed_directions_on_sphere(config::NUM_DIRECTIONS);
     let grids: Result<Vec<_>> = args.grid_files.iter().map(|file| convert_to_grid(&file)).collect();
-    let run_data_list: Vec<_> = grids?.into_iter().map(|mut grid| run_sweep_on_processors(&mut grid, &directions)).collect();
+    let run_data_list: Vec<_> = match args.domain_decomposition {
+        None => grids?.into_iter().map(|mut grid| run_sweep_on_processors(&mut grid, &directions)).collect(),
+        Some(num) => grids?.into_iter().map(|mut grid| run_sweep_and_domain_decomposition_on_processors(&mut grid, &directions, num)).collect(),
+    };
     let reference = &run_data_list[0];
     for run_data in run_data_list.iter() {
         println!(
@@ -60,7 +63,7 @@ fn convert_to_grid(file: &Path) -> Result<Grid> {
     Err(anyhow!("Unknown file ending"))
 }
 
-fn _run_sweep_and_domain_decomposition_on_processors(
+fn run_sweep_and_domain_decomposition_on_processors(
     mut grid: &mut Grid,
     directions: &[Direction],
     num_processors: usize,
