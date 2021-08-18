@@ -25,10 +25,10 @@ class Domain:
 
 
 class Cell:
-    def __init__(self, pos: np.ndarray):
+    def __init__(self, pos: np.ndarray, processor: int):
         self.pos = pos
         self.neighbours = []
-        self.processor = 0 if pos[0] < 0.5 else 1
+        self.processor = int(processor)
 
     def __repr__(self):
         return "{}@{}".format(self.pos)
@@ -37,11 +37,11 @@ class Cell:
         self.neighbours.append(cell)
 
 
-def getVoronoiGrid(points: np.ndarray, domain: Domain):
+def getVoronoiGrid(points: np.ndarray, tasks: np.ndarray, domain: Domain):
     numPoints = len(points)
     cells = []
-    for point in points:
-        cells.append(Cell(point))
+    for (point, task) in zip(points, tasks):
+        cells.append(Cell(point, task))
     voronoiGrid = Voronoi(points)
     grid = Grid(cells, points)
     for (i, cell) in enumerate(grid.cells):
@@ -79,10 +79,14 @@ def snap(value, minValue, maxValue):
 def readFile(filename: Path):
     with h5py.File(filename, "r") as f:
         boxSize = f["Parameters"].attrs["BoxSize"]
-        coordinatesDataset = f["PartType0"]["Coordinates"]
-        coordinates = np.zeros(coordinatesDataset.shape)
-        coordinatesDataset.read_direct(coordinates)
-        return boxSize, coordinates
+        coordinates = readDataset(f, f["PartType0"]["Coordinates"])
+        tasks = readDataset(f, f["PartType0"]["task"])
+        return boxSize, coordinates, tasks
+
+def readDataset(f, dataset):
+    data = np.zeros(dataset.shape)
+    dataset.read_direct(data)
+    return data
 
 
 def writeGridToFile(filename: str, grid: Grid):
@@ -97,9 +101,9 @@ def writeGridToFile(filename: str, grid: Grid):
 
 def main():
     filename = sys.argv[1]
-    boxSize, coordinates = readFile(filename)
+    boxSize, coordinates, tasks = readFile(filename)
     domain = Domain((0, boxSize), (0, boxSize), (0, boxSize))
-    grid = getVoronoiGrid(coordinates, domain)
+    grid = getVoronoiGrid(coordinates, tasks, domain)
     outFile = filename.replace("hdf5", "dat")
     writeGridToFile(outFile, grid)
 
