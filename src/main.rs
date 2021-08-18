@@ -115,7 +115,7 @@ fn read_hdf5_file(hdf5_file: &Path) -> Result<Grid> {
         false);
     let grid_file = match out.success {
         true => Ok(hdf5_file.with_extension("dat")),
-        false => Err(anyhow!("Failed to convert snapshot to grid file")),
+        false => Err(anyhow!("Failed to convert snapshot to grid file: {}", &out.stderr)),
     };
     grid_file.and_then(|file| read_grid_file(&file).context("While reading grid file"))
 }
