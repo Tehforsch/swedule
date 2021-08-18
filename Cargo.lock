@@ -827,6 +827,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap 3.0.0-beta.2",
+ "criterion",
  "generational-arena",
  "hilbert",
  "itertools",
