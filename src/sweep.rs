@@ -1,4 +1,4 @@
-use std::collections::VecDeque;
+use std::collections::{VecDeque};
 
 use generational_arena::Index;
 
@@ -20,9 +20,8 @@ impl<'a> Sweep<'a> {
             .iter()
             .map(|dir| grid.get_dependency_graph(dir))
             .collect();
-        let processors = (0..num_processors)
-            .map(|num| Processor::new(num, get_initial_queue(&graph, num)))
-            .collect();
+        let processors = get_processors(&graph, num_processors);
+
         Sweep { graph, processors }
     }
 
@@ -92,13 +91,15 @@ fn get_next_free_processor(processors: &mut [Processor]) -> &mut Processor {
         .unwrap()
 }
 
-fn get_initial_queue(graph: &DependencyGraph, processor_num: usize) -> VecDeque<Index> {
-    let mut queue = VecDeque::new();
+fn get_processors(graph: &DependencyGraph, num_processors: usize) -> Vec<Processor> {
+    let mut processors: Vec<Processor> = (0..num_processors)
+                .map(|num| Processor::new(num, VecDeque::new()))
+                .collect();
     for task_node in graph.iter_nodes() {
         let task = &task_node.data;
-        if task.processor_num == processor_num && task.num_upwind == 0 {
-            queue.push_back(task_node.index);
+        if task.num_upwind == 0 {
+            processors[task.processor_num].add_task_to_queue(task_node.index);
         }
     }
-    queue
+    processors
 }
