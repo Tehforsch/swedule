@@ -1,4 +1,4 @@
-use crate::processor::Processor;
+use crate::processors::Processors;
 
 pub struct RunData {
     pub time: f64,
@@ -8,7 +8,7 @@ pub struct RunData {
 }
 
 impl RunData {
-    pub fn new(processors: &[Processor]) -> Self {
+    pub fn new(processors: &Processors) -> Self {
         let time = *processors
             .iter()
             .map(|processor| processor.time)

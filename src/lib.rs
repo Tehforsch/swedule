@@ -10,6 +10,7 @@ pub mod graph;
 pub mod grid;
 pub mod node;
 pub mod processor;
+pub mod processors;
 pub mod run;
 pub mod run_data;
 pub mod sweep;

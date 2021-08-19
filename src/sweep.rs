@@ -1,17 +1,16 @@
-use std::collections::VecDeque;
-
 use generational_arena::Index;
 
 use crate::{
     direction::Direction,
     grid::{DependencyGraph, Grid},
     processor::Processor,
+    processors::Processors,
     run_data::RunData,
 };
 
 pub struct Sweep<'a> {
     graph: DependencyGraph<'a>,
-    processors: Vec<Processor>,
+    processors: Processors,
 }
 
 impl<'a> Sweep<'a> {
@@ -20,7 +19,7 @@ impl<'a> Sweep<'a> {
             .iter()
             .map(|dir| grid.get_dependency_graph(dir))
             .collect();
-        let processors = get_processors(&graph, num_processors);
+        let processors = Processors::new(&graph, num_processors);
 
         Sweep { graph, processors }
     }
@@ -28,7 +27,7 @@ impl<'a> Sweep<'a> {
     pub fn run(&mut self) -> RunData {
         let mut num_to_solve = self.graph.len();
         loop {
-            let processor = get_next_free_processor(&mut self.processors);
+            let processor = &mut self.processors.get_next_free();
             let current_time = processor.time;
             let task_index = processor.get_next_task();
             if let Some(task_index) = task_index {
@@ -75,25 +74,4 @@ fn handle_task_solving<'a>(
             }
         }
     }
-}
-
-fn get_next_free_processor(processors: &mut [Processor]) -> &mut Processor {
-    processors
-        .iter_mut()
-        .filter(|processor| !processor.asleep)
-        .min_by_key(|processor| processor.time)
-        .unwrap()
-}
-
-fn get_processors(graph: &DependencyGraph, num_processors: usize) -> Vec<Processor> {
-    let mut processors: Vec<Processor> = (0..num_processors)
-        .map(|num| Processor::new(num, VecDeque::new()))
-        .collect();
-    for task_node in graph.iter_nodes() {
-        let task = &task_node.data;
-        if task.num_upwind == 0 {
-            processors[task.processor_num].add_task_to_queue(task_node.index);
-        }
-    }
-    processors
 }
