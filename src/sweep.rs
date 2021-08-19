@@ -26,13 +26,14 @@ impl<'a> Sweep<'a> {
     }
 
     pub fn run(&mut self) -> RunData {
-        let num_to_solve = self.graph.len();
+        let mut num_to_solve = self.graph.len();
         loop {
             let processor = get_next_free_processor(&mut self.processors);
             let current_time = processor.time;
             let task_index = processor.get_next_task();
             if let Some(task_index) = task_index {
                 handle_task_solving(&mut self.graph, processor, task_index);
+                num_to_solve -= 1;
             } else {
                 let num_received = processor.receive_tasks();
                 if num_received == 0 {
@@ -44,18 +45,11 @@ impl<'a> Sweep<'a> {
                     self.processors[processor_index].wake_up(current_time);
                 }
             }
-            if self.get_num_solved() == num_to_solve {
+            if num_to_solve == 0 {
                 break;
             }
         }
         RunData::new(&self.processors)
-    }
-
-    pub fn get_num_solved(&self) -> usize {
-        self.processors
-            .iter()
-            .map(|processor| processor.num_solved)
-            .sum()
     }
 }
 
