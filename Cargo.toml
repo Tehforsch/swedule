@@ -18,5 +18,8 @@ regex = "1.5.4"
 criterion = "0.3"
 
 [[bench]]
-name = "ics_16_1"
+name = "ics_16"
 harness = false
+
+[profile.release]
+debug = true
