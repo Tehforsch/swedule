@@ -1,4 +1,7 @@
-use std::{collections::VecDeque, ops::{Index, IndexMut}};
+use std::{
+    collections::VecDeque,
+    ops::{Index, IndexMut},
+};
 
 use ordered_float::OrderedFloat;
 use priority_queue::PriorityQueue;
@@ -20,7 +23,10 @@ impl Processors {
                 processors[task.processor_num].add_task_to_queue(task_node.index);
             }
         }
-        let queue = processors.iter().map(|processor| Processors::get_queue_element(processor)).collect();
+        let queue = processors
+            .iter()
+            .map(|processor| Processors::get_queue_element(processor))
+            .collect();
         Processors { processors, queue }
     }
 
@@ -44,7 +50,12 @@ impl Processors {
     }
 
     fn get_queue_element(processor: &Processor) -> (usize, ProcessorPriority) {
-        (processor.num, ProcessorPriority { time: -processor.time})
+        (
+            processor.num,
+            ProcessorPriority {
+                time: -processor.time,
+            },
+        )
     }
 
     pub fn wake_up_at(&mut self, processor_num: usize, time: OrderedFloat<f64>) {
