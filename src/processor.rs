@@ -88,7 +88,7 @@ impl Processor {
         self.asleep = true;
     }
 
-    pub fn wake_up(&mut self, time: OrderedFloat<f64>) {
+    pub fn wake_up_at(&mut self, time: OrderedFloat<f64>) {
         if self.asleep {
             self.time_spent_waiting += *time - *self.time;
             self.time = time;

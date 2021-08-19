@@ -28,24 +28,30 @@ impl<'a> Sweep<'a> {
         let mut num_to_solve = self.graph.len();
         loop {
             let processor = &mut self.processors.get_next_free();
+            let processor_num = processor.num;
             let current_time = processor.time;
             let task_index = processor.get_next_task();
+            let mut asleep = false;
             if let Some(task_index) = task_index {
                 handle_task_solving(&mut self.graph, processor, task_index);
                 num_to_solve -= 1;
             } else {
                 let num_received = processor.receive_tasks();
                 if num_received == 0 {
+                    asleep = true;
                     processor.go_to_sleep();
                 }
                 let sent_tasks = processor.send_tasks();
                 for (processor_index, task) in sent_tasks {
                     self.processors[processor_index].add_task_to_receive_queue(task);
-                    self.processors[processor_index].wake_up(current_time);
+                    self.processors.wake_up_at(processor_index, current_time);
                 }
             }
             if num_to_solve == 0 {
                 break;
+            }
+            if !asleep {
+                self.processors.reinsert_with_new_priority(processor_num);
             }
         }
         RunData::new(&self.processors)
