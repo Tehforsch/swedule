@@ -27,10 +27,10 @@ impl<N, E> Graph<N, E> {
             label_indices.insert(i, index);
         }
         for (index_0, index_1, edge_data) in edges.into_iter() {
-            let index_0 = label_indices.get(&index_0).unwrap();
-            let index_1 = label_indices.get(&index_1).unwrap();
-            arena.get_mut(*index_0).unwrap().edges.push(Edge {
-                index: *index_1,
+            let index_0 = label_indices[&index_0];
+            let index_1 = label_indices[&index_1];
+            arena.get_mut(index_0).unwrap().edges.push(Edge {
+                index: index_1,
                 data: edge_data,
             });
         }
