@@ -102,15 +102,7 @@ fn read_grid_file(grid_file: &Path) -> io::Result<Grid> {
 
 fn read_hdf5_file(hdf5_file: &Path) -> Result<Grid> {
     let filename = hdf5_file.to_str().unwrap();
-    let out = get_shell_command_output(
-        &"python3",
-        &[
-            "/home/toni/projects/swedule/getVoronoiNeighbours/getNeighbours.py",
-            filename,
-        ],
-        None,
-        false,
-    );
+    let out = get_shell_command_output(&"getNeighbours", &[filename], None, false);
     let grid_file = match out.success {
         true => Ok(hdf5_file.with_extension("dat")),
         false => Err(anyhow!(
