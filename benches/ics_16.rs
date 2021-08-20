@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use swedule::{command_line_args::CommandLineArgs, run::run};
+use voronoi_swim::{command_line_args::CommandLineArgs, run::run};
 
 use std::path::PathBuf;
 

@@ -832,21 +832,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
 
 [[package]]
-name = "swedule"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap 3.0.0-beta.2",
- "criterion",
- "generational-arena",
- "hilbert",
- "itertools",
- "ordered-float",
- "priority-queue",
- "regex",
-]
-
-[[package]]
 name = "syn"
 version = "1.0.74"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -923,6 +908,21 @@ name = "version_check"
 version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5fecdca9a5291cc2b8dcf7dc02453fee791a280f3743cb0905f8822ae463b3fe"
+
+[[package]]
+name = "voronoi_swim"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap 3.0.0-beta.2",
+ "criterion",
+ "generational-arena",
+ "hilbert",
+ "itertools",
+ "ordered-float",
+ "priority-queue",
+ "regex",
+]
 
 [[package]]
 name = "walkdir"

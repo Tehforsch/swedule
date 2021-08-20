@@ -1,5 +1,5 @@
 [package]
-name = "swedule"
+name = "voronoi_swim"
 version = "0.1.0"
 edition = "2018"
 
