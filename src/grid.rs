@@ -25,7 +25,7 @@ impl Grid {
             .collect();
         let mut dependency_data = vec![];
         for (upwind_cell, downwind_cell, face) in self.data.iter_edges() {
-            if Grid::is_downwind(face, &direction) {
+            if Grid::is_downwind(face, direction) {
                 dependency_data.push((upwind_cell.index, downwind_cell.index, Dependency));
                 tasks[downwind_cell.index].num_upwind += 1;
             }

@@ -16,7 +16,7 @@ pub fn run(args: &CommandLineArgs) -> Result<(), Box<dyn Error>> {
     let grids: Result<Vec<_>> = args
         .grid_files
         .iter()
-        .map(|file| convert_to_grid(&file))
+        .map(|file| convert_to_grid(file))
         .collect();
     let run_data_list: Vec<_> = match args.domain_decomposition {
         None => grids?
@@ -37,8 +37,8 @@ pub fn run(args: &CommandLineArgs) -> Result<(), Box<dyn Error>> {
                 "{:>4} {:.3} (speedup: {:>6.2}, efficiency {:>6.2}), comm: {:.3}, idle: {:.3}",
                 run_data.num_processors,
                 run_data.time,
-                run_data.get_speedup(&reference),
-                run_data.get_efficiency(&reference),
+                run_data.get_speedup(reference),
+                run_data.get_efficiency(reference),
                 run_data.time_spent_communicating / run_data.time,
                 run_data.time_spent_waiting / run_data.time,
             );
@@ -65,13 +65,13 @@ fn run_sweep_and_domain_decomposition_on_processors(
     num_processors: usize,
 ) -> RunData {
     do_domain_decomposition(&mut grid, num_processors);
-    let mut sweep = Sweep::new(&grid, &directions, num_processors);
+    let mut sweep = Sweep::new(grid, directions, num_processors);
     sweep.run()
 }
 
 fn run_sweep_on_processors(grid: &mut Grid, directions: &[Direction]) -> RunData {
     let num_processors = grid.iter().map(|cell| cell.processor_num).max().unwrap() + 1;
-    let mut sweep = Sweep::new(&grid, &directions, num_processors);
+    let mut sweep = Sweep::new(grid, directions, num_processors);
     sweep.run()
 }
 
@@ -102,7 +102,7 @@ fn read_grid_file(grid_file: &Path) -> io::Result<Grid> {
 
 fn read_hdf5_file(hdf5_file: &Path) -> Result<Grid> {
     let filename = hdf5_file.to_str().unwrap();
-    let out = get_shell_command_output(&"getNeighbours", &[filename], None, false);
+    let out = get_shell_command_output("getNeighbours", &[filename], None, false);
     let grid_file = match out.success {
         true => Ok(hdf5_file.with_extension("dat")),
         false => Err(anyhow!(

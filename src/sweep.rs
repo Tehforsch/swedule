@@ -66,7 +66,7 @@ fn handle_task_solving<'a>(
     let task_node = graph.get(task_index).unwrap();
     let edge_indices: Vec<Index> = task_node.edges.iter().map(|edge| edge.index).collect();
     let task = &task_node.data;
-    processor.solve(&task);
+    processor.solve(task);
     for dependency_index in edge_indices.iter() {
         let downwind_task_node = graph.get_mut(*dependency_index).unwrap();
         let downwind_task = &mut downwind_task_node.data;
