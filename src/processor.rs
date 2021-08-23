@@ -5,6 +5,7 @@ use ordered_float::OrderedFloat;
 
 use crate::config::*;
 use crate::task::Task;
+use crate::vector_3d::Vector3D;
 
 type TaskQueue = VecDeque<Index>;
 type SendQueue = VecDeque<(usize, Index)>;
@@ -15,6 +16,7 @@ pub struct Processor {
     queue: TaskQueue,
     send_queue: SendQueue,
     receive_queue: ReceiveQueue,
+    domain_center: Vector3D,
     pub num_solved: usize,
     pub time: OrderedFloat<f64>,
     pub num: usize,
@@ -24,10 +26,12 @@ pub struct Processor {
 }
 
 impl Processor {
-    pub fn new(num: usize, queue: TaskQueue) -> Self {
+    pub fn new(num: usize, queue: TaskQueue, domain_center: Vector3D) -> Self {
+        dbg!(&domain_center);
         Processor {
             num,
             queue,
+            domain_center,
             send_queue: SendQueue::new(),
             receive_queue: ReceiveQueue::new(),
             num_solved: 0,
