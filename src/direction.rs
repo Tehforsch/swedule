@@ -13,7 +13,7 @@ pub fn get_directions(num: usize) -> Vec<Direction> {
     match num {
         1 => get_directions_from_constant(&DIRECTION_BINS_1),
         84 => get_directions_from_constant(&DIRECTION_BINS_84),
-        _ => get_equally_distributed_directions_on_sphere(num)
+        _ => get_equally_distributed_directions_on_sphere(num),
     }
 }
 
@@ -51,10 +51,12 @@ pub fn get_equally_distributed_directions_on_sphere(num_directions: usize) -> Ve
 }
 
 pub fn get_directions_from_constant(constant: &[[f64; 3]]) -> Vec<Direction> {
-    constant.iter().enumerate().map(|(index, vec)| {
-        Direction {
+    constant
+        .iter()
+        .enumerate()
+        .map(|(index, vec)| Direction {
             index,
             vector: Vector3D::new(vec[0], vec[1], vec[2]),
-        }
-    }).collect()
+        })
+        .collect()
 }

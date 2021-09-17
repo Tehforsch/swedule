@@ -1,9 +1,12 @@
-use std::{ops::{Index, IndexMut}};
+use std::ops::{Index, IndexMut};
 
 use ordered_float::OrderedFloat;
 use priority_queue::PriorityQueue;
 
-use crate::{grid::DependencyGraph, processor::Processor, processor_priority::ProcessorPriority, vector_3d::Vector3D};
+use crate::{
+    grid::DependencyGraph, processor::Processor, processor_priority::ProcessorPriority,
+    vector_3d::Vector3D,
+};
 pub struct Processors {
     processors: Vec<Processor>,
     queue: PriorityQueue<usize, ProcessorPriority>,
@@ -12,7 +15,9 @@ pub struct Processors {
 impl Processors {
     pub fn new(graph: &DependencyGraph, num_processors: usize) -> Self {
         let centers = Processors::get_centers(graph, num_processors);
-        let mut processors: Vec<Processor> = centers.into_iter().enumerate()
+        let mut processors: Vec<Processor> = centers
+            .into_iter()
+            .enumerate()
             .map(|(num, center)| Processor::new(num, PriorityQueue::new(), center))
             .collect();
         for task_node in graph.iter_nodes() {
@@ -30,7 +35,9 @@ impl Processors {
     }
 
     pub fn get_centers(graph: &DependencyGraph, num_processors: usize) -> Vec<Vector3D> {
-        let mut centers: Vec<Vector3D> = (0..num_processors).map(|_| Vector3D::new(0., 0., 0.)).collect();
+        let mut centers: Vec<Vector3D> = (0..num_processors)
+            .map(|_| Vector3D::new(0., 0., 0.))
+            .collect();
         let mut num_cells: Vec<usize> = (0..num_processors).map(|_| 0).collect();
         for task_node in graph.iter_nodes() {
             centers[task_node.data.processor_num] += &task_node.data.cell.center;

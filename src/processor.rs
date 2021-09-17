@@ -6,8 +6,8 @@ use priority_queue::PriorityQueue;
 
 use crate::config::*;
 use crate::task::Task;
-use crate::vector_3d::Vector3D;
 use crate::task_priority::TaskPriority;
+use crate::vector_3d::Vector3D;
 
 type TaskQueue = PriorityQueue<Index, TaskPriority>;
 type SendQueue = VecDeque<(usize, Index)>;

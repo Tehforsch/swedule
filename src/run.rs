@@ -4,7 +4,7 @@ use std::{error::Error, fs, io, path::Path};
 
 use crate::cell::CellId;
 use crate::command_line_args::CommandLineArgs;
-use crate::direction::{Direction, get_directions};
+use crate::direction::{get_directions, Direction};
 use crate::grid::Grid;
 use crate::run_data::RunData;
 use crate::{
@@ -94,7 +94,10 @@ fn read_grid_file(grid_file: &Path) -> io::Result<Grid> {
         label_to_indices.insert(cell.get_id(), index);
         cell.global_index = index;
     }
-    let edges: Vec<(usize, usize)> = edges.into_iter().map(|(id, neighbour)| (label_to_indices[&id], label_to_indices[&neighbour])).collect();
+    let edges: Vec<(usize, usize)> = edges
+        .into_iter()
+        .map(|(id, neighbour)| (label_to_indices[&id], label_to_indices[&neighbour]))
+        .collect();
     Ok(Grid::from_cell_pairs(cells, &edges))
 }
 

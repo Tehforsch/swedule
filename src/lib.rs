@@ -16,6 +16,6 @@ pub mod run;
 pub mod run_data;
 pub mod sweep;
 pub mod task;
+pub mod task_priority;
 pub mod util;
 pub mod vector_3d;
-pub mod task_priority;

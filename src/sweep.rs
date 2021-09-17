@@ -1,6 +1,13 @@
 use generational_arena::Index;
 
-use crate::{config::BATCH_SIZE, direction::Direction, grid::{DependencyGraph, Grid}, processor::Processor, processors::Processors, run_data::RunData};
+use crate::{
+    config::BATCH_SIZE,
+    direction::Direction,
+    grid::{DependencyGraph, Grid},
+    processor::Processor,
+    processors::Processors,
+    run_data::RunData,
+};
 
 pub struct Sweep<'a> {
     graph: DependencyGraph<'a>,

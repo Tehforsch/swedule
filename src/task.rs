@@ -11,7 +11,7 @@ pub struct Task<'a> {
 impl<'a> Task<'a> {
     pub fn get_priority(&self) -> TaskPriority {
         TaskPriority {
-            priority: self.cell.global_index + self.direction.index * 1000000
+            priority: self.cell.global_index + self.direction.index * 1000000,
         }
     }
 }
