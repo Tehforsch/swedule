@@ -12,7 +12,7 @@ generational-arena = "0.2.8"
 hilbert = "0.1.1"
 itertools = "0.10.1"
 ordered-float = "2.7.0"
-priority-queue = "1.1.1"
+priority-queue = "1.2.0"
 regex = "1.5.4"
 
 [dev-dependencies]
