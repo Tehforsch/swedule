@@ -1,11 +1,20 @@
 use std::f64::consts::PI;
 
+use crate::config::{DIRECTION_BINS_1, DIRECTION_BINS_84};
 use crate::vector_3d::Vector3D;
 
 #[derive(Hash, PartialEq, Eq, Clone, Debug)]
 pub struct Direction {
     pub vector: Vector3D,
     pub index: usize,
+}
+
+pub fn get_directions(num: usize) -> Vec<Direction> {
+    match num {
+        1 => get_directions_from_constant(&DIRECTION_BINS_1),
+        84 => get_directions_from_constant(&DIRECTION_BINS_84),
+        _ => get_equally_distributed_directions_on_sphere(num)
+    }
 }
 
 pub fn get_equally_distributed_directions_on_sphere(num_directions: usize) -> Vec<Direction> {
@@ -39,4 +48,13 @@ pub fn get_equally_distributed_directions_on_sphere(num_directions: usize) -> Ve
             index: i,
         })
         .collect()
+}
+
+pub fn get_directions_from_constant(constant: &[[f64; 3]]) -> Vec<Direction> {
+    constant.iter().enumerate().map(|(index, vec)| {
+        Direction {
+            index,
+            vector: Vector3D::new(vec[0], vec[1], vec[2]),
+        }
+    }).collect()
 }

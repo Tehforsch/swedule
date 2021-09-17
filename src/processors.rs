@@ -1,7 +1,4 @@
-use std::{
-    collections::VecDeque,
-    ops::{Index, IndexMut},
-};
+use std::{ops::{Index, IndexMut}};
 
 use ordered_float::OrderedFloat;
 use priority_queue::PriorityQueue;
@@ -16,12 +13,13 @@ impl Processors {
     pub fn new(graph: &DependencyGraph, num_processors: usize) -> Self {
         let centers = Processors::get_centers(graph, num_processors);
         let mut processors: Vec<Processor> = centers.into_iter().enumerate()
-            .map(|(num, center)| Processor::new(num, VecDeque::new(), center))
+            .map(|(num, center)| Processor::new(num, PriorityQueue::new(), center))
             .collect();
         for task_node in graph.iter_nodes() {
             let task = &task_node.data;
+            let priority = task.get_priority();
             if task.num_upwind == 0 {
-                processors[task.processor_num].add_task_to_queue(task_node.index);
+                processors[task.processor_num].add_task_to_queue(task_node.index, priority);
             }
         }
         let queue = processors

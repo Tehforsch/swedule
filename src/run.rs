@@ -1,9 +1,10 @@
 use anyhow::{anyhow, Context, Result};
+use std::collections::HashMap;
 use std::{error::Error, fs, io, path::Path};
 
+use crate::cell::CellId;
 use crate::command_line_args::CommandLineArgs;
-use crate::config::NUM_DIRECTIONS;
-use crate::direction::{get_equally_distributed_directions_on_sphere, Direction};
+use crate::direction::{Direction, get_directions};
 use crate::grid::Grid;
 use crate::run_data::RunData;
 use crate::{
@@ -12,7 +13,8 @@ use crate::{
 };
 
 pub fn run(args: &CommandLineArgs) -> Result<(), Box<dyn Error>> {
-    let directions = get_equally_distributed_directions_on_sphere(NUM_DIRECTIONS);
+    // let directions = get_equally_distributed_directions_on_sphere(NUM_DIRECTIONS);
+    let directions = get_directions(1);
     let grids: Result<Vec<_>> = args
         .grid_files
         .iter()
@@ -80,24 +82,38 @@ fn read_grid_file(grid_file: &Path) -> io::Result<Grid> {
     let mut cells = vec![];
     let mut edges = vec![];
     for line in contents.lines() {
-        let mut split = line.split_ascii_whitespace();
-        let label = split.next().unwrap().parse::<usize>().unwrap();
-        let processor_num = split.next().unwrap().parse::<usize>().unwrap();
-        let x = split.next().unwrap().parse::<f64>().unwrap();
-        let y = split.next().unwrap().parse::<f64>().unwrap();
-        let z = split.next().unwrap().parse::<f64>().unwrap();
-        let neighbours = split.map(|num| num.parse::<usize>().unwrap());
-        let center = Vector3D::new(x, y, z);
-        cells.push(Cell {
-            index: label,
-            center,
-            processor_num,
-        });
+        let (cell, neighbours) = get_cell_and_neighbour_list_from_line(line);
         for neighbour in neighbours {
-            edges.push((label, neighbour));
+            edges.push((cell.get_id(), neighbour));
         }
+        cells.push(cell);
     }
+    let mut label_to_indices: HashMap<CellId, usize> = HashMap::new();
+    cells.sort_by_key(|cell| (cell.processor_num, cell.local_index));
+    for (index, mut cell) in cells.iter_mut().enumerate() {
+        label_to_indices.insert(cell.get_id(), index);
+        cell.global_index = index;
+    }
+    let edges: Vec<(usize, usize)> = edges.into_iter().map(|(id, neighbour)| (label_to_indices[&id], label_to_indices[&neighbour])).collect();
     Ok(Grid::from_cell_pairs(cells, &edges))
+}
+
+fn get_cell_and_neighbour_list_from_line(line: &str) -> (Cell, Vec<CellId>) {
+    let mut split = line.split_ascii_whitespace();
+    let index = split.next().unwrap().parse::<usize>().unwrap();
+    let processor_num = split.next().unwrap().parse::<usize>().unwrap();
+    let x = split.next().unwrap().parse::<f64>().unwrap();
+    let y = split.next().unwrap().parse::<f64>().unwrap();
+    let z = split.next().unwrap().parse::<f64>().unwrap();
+    let neighbours = split.map(|num| num.parse::<CellId>().unwrap()).collect();
+    let center = Vector3D::new(x, y, z);
+    let cell = Cell {
+        global_index: 0,
+        local_index: index,
+        processor_num,
+        center,
+    };
+    (cell, neighbours)
 }
 
 fn read_hdf5_file(hdf5_file: &Path) -> Result<Grid> {

@@ -18,3 +18,4 @@ pub mod sweep;
 pub mod task;
 pub mod util;
 pub mod vector_3d;
+pub mod task_priority;
