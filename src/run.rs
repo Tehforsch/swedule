@@ -9,7 +9,7 @@ use crate::grid::Grid;
 use crate::run_data::RunData;
 use crate::{
     cell::Cell, domain_decomposition::do_domain_decomposition, sweep::Sweep,
-    util::get_shell_command_output, vector_3d::Vector3D,
+    vector_3d::Vector3D,
 };
 
 pub fn run(args: &CommandLineArgs) -> Result<(), Box<dyn Error>> {
@@ -52,11 +52,8 @@ pub fn run(args: &CommandLineArgs) -> Result<(), Box<dyn Error>> {
 fn convert_to_grid(file: &Path) -> Result<Grid> {
     if let Some(extension) = file.extension() {
         let ext_str = extension.to_str().unwrap();
-        if ext_str == "hdf5" {
-            return read_hdf5_file(file);
-        } else if ext_str == "dat" {
-            return read_grid_file(file).context("While reading file as grid file");
-        }
+        assert_eq!(ext_str, "dat");
+        return read_grid_file(file).context("While reading file as grid file");
     }
     Err(anyhow!("Unknown file ending"))
 }
@@ -117,17 +114,4 @@ fn get_cell_and_neighbour_list_from_line(line: &str) -> (Cell, Vec<CellId>) {
         center,
     };
     (cell, neighbours)
-}
-
-fn read_hdf5_file(hdf5_file: &Path) -> Result<Grid> {
-    let filename = hdf5_file.to_str().unwrap();
-    let out = get_shell_command_output("getNeighbours", &[filename], None, false);
-    let grid_file = match out.success {
-        true => Ok(hdf5_file.with_extension("dat")),
-        false => Err(anyhow!(
-            "Failed to convert snapshot to grid file: {}",
-            &out.stderr
-        )),
-    };
-    grid_file.and_then(|file| read_grid_file(&file).context("While reading grid file"))
 }
