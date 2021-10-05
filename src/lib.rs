@@ -9,6 +9,7 @@ pub mod face;
 pub mod graph;
 pub mod grid;
 pub mod node;
+pub mod param_file;
 pub mod processor;
 pub mod processor_priority;
 pub mod processors;

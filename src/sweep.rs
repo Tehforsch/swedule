@@ -1,9 +1,9 @@
 use generational_arena::Index;
 
 use crate::{
-    config::BATCH_SIZE,
     direction::Direction,
     grid::{DependencyGraph, Grid},
+    param_file::ParamFile,
     processor::Processor,
     processors::Processors,
     run_data::RunData,
@@ -12,17 +12,27 @@ use crate::{
 pub struct Sweep<'a> {
     graph: DependencyGraph<'a>,
     processors: Processors,
+    param_file: ParamFile,
 }
 
 impl<'a> Sweep<'a> {
-    pub fn new(grid: &'a Grid, directions: &[Direction], num_processors: usize) -> Self {
+    pub fn new(
+        param_file: &ParamFile,
+        grid: &'a Grid,
+        directions: &[Direction],
+        num_processors: usize,
+    ) -> Self {
         let graph: DependencyGraph = directions
             .iter()
             .map(|dir| grid.get_dependency_graph(dir))
             .collect();
-        let processors = Processors::new(&graph, num_processors);
+        let processors = Processors::new(&graph, num_processors, param_file);
 
-        Sweep { graph, processors }
+        Sweep {
+            graph,
+            processors,
+            param_file: param_file.clone(),
+        }
     }
 
     pub fn run(&mut self) -> RunData {
@@ -39,7 +49,7 @@ impl<'a> Sweep<'a> {
                 num_to_solve -= 1;
                 num_solved_without_sending += 1;
             }
-            if task_index.is_none() || num_solved_without_sending >= BATCH_SIZE {
+            if task_index.is_none() || num_solved_without_sending >= self.param_file.batch_size {
                 num_solved_without_sending = 0;
                 let num_received = processor.receive_tasks();
                 if num_received == 0 && task_index.is_none() {

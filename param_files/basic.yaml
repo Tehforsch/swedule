@@ -1,0 +1,5 @@
+send_time_offset: 5e-4
+send_time_per_byte: 1.8e-9
+recv_time_offset: 5e-4
+recv_time_per_byte: 1.8e-9
+solve_time_offset: 0.7e-6

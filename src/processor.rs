@@ -5,6 +5,7 @@ use ordered_float::OrderedFloat;
 use priority_queue::PriorityQueue;
 
 use crate::config::*;
+use crate::param_file::ParamFile;
 use crate::task::Task;
 use crate::task_priority::TaskPriority;
 use crate::vector_3d::Vector3D;
@@ -15,6 +16,7 @@ type ReceiveQueue = PriorityQueue<Index, TaskPriority>;
 
 #[derive(Debug)]
 pub struct Processor {
+    param_file: ParamFile,
     pub queue: TaskQueue,
     send_queue: SendQueue,
     receive_queue: ReceiveQueue,
@@ -28,7 +30,12 @@ pub struct Processor {
 }
 
 impl Processor {
-    pub fn new(num: usize, queue: TaskQueue, domain_center: Vector3D) -> Self {
+    pub fn new(
+        num: usize,
+        queue: TaskQueue,
+        domain_center: Vector3D,
+        param_file: &ParamFile,
+    ) -> Self {
         Processor {
             num,
             queue,
@@ -40,6 +47,7 @@ impl Processor {
             asleep: false,
             time_spent_waiting: 0.0,
             time_spent_communicating: 0.0,
+            param_file: param_file.clone(),
         }
     }
 
@@ -49,7 +57,7 @@ impl Processor {
 
     pub fn solve(&mut self, _task: &Task) {
         self.num_solved += 1;
-        self.time += SOLVE_TIME;
+        self.time += self.param_file.solve_time_offset;
     }
 
     pub fn send_tasks(&mut self) -> SendQueue {
@@ -70,7 +78,10 @@ impl Processor {
     }
 
     fn get_send_time(&self, num_sent: usize) -> f64 {
-        SEND_TIME_OFFSET_SECONDS + num_sent as f64 * SEND_TIME_PER_BYTE_SECONDS * SIZE_PER_MESSAGE
+        self.param_file.send_time_offset
+            + num_sent as f64
+                * self.param_file.send_time_per_byte
+                * self.param_file.size_per_message
     }
 
     fn get_receive_time(&self, num_received: usize) -> f64 {
@@ -95,8 +106,10 @@ impl Processor {
 
     pub fn wake_up_at(&mut self, time: OrderedFloat<f64>) {
         if self.asleep {
-            self.time_spent_waiting += *time - *self.time;
-            self.time = time;
+            if *time > *self.time {
+                self.time_spent_waiting += *time - *self.time;
+                self.time = time;
+            }
             self.asleep = false;
         }
     }

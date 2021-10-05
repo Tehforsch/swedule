@@ -1,12 +1,4 @@
-pub static BATCH_SIZE: usize = 10000000;
-
-// Empirical values
-pub static SEND_TIME_OFFSET_SECONDS: f64 = 5e-4;
-// pub static SEND_TIME_OFFSET_SECONDS: f64 = 0.0;
-pub static SEND_TIME_PER_BYTE_SECONDS: f64 = 1.8e-9;
-pub static SIZE_PER_MESSAGE: f64 = 32.0 * 2.0 + 64.0 * 5.0;
-pub static SOLVE_TIME: f64 = 0.7e-6;
-pub static NUM_DIRECTIONS: usize = 84;
+pub static CONFIG_FILE_NAME: &str = "config.yaml";
 
 pub const DIRECTION_BINS_84: [[f64; 3]; 84] = [
     [-0.0350007, 0.880555, -0.47265],

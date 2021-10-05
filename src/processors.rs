@@ -4,8 +4,8 @@ use ordered_float::OrderedFloat;
 use priority_queue::PriorityQueue;
 
 use crate::{
-    grid::DependencyGraph, processor::Processor, processor_priority::ProcessorPriority,
-    vector_3d::Vector3D,
+    grid::DependencyGraph, param_file::ParamFile, processor::Processor,
+    processor_priority::ProcessorPriority, vector_3d::Vector3D,
 };
 pub struct Processors {
     processors: Vec<Processor>,
@@ -13,12 +13,12 @@ pub struct Processors {
 }
 
 impl Processors {
-    pub fn new(graph: &DependencyGraph, num_processors: usize) -> Self {
+    pub fn new(graph: &DependencyGraph, num_processors: usize, param_file: &ParamFile) -> Self {
         let centers = Processors::get_centers(graph, num_processors);
         let mut processors: Vec<Processor> = centers
             .into_iter()
             .enumerate()
-            .map(|(num, center)| Processor::new(num, PriorityQueue::new(), center))
+            .map(|(num, center)| Processor::new(num, PriorityQueue::new(), center, param_file))
             .collect();
         for task_node in graph.iter_nodes() {
             let task = &task_node.data;

@@ -6,15 +6,15 @@ use crate::cell::CellId;
 use crate::command_line_args::CommandLineArgs;
 use crate::direction::{get_directions, Direction};
 use crate::grid::Grid;
+use crate::param_file::ParamFile;
 use crate::run_data::RunData;
 use crate::{
-    cell::Cell, domain_decomposition::do_domain_decomposition, sweep::Sweep,
-    vector_3d::Vector3D,
+    cell::Cell, domain_decomposition::do_domain_decomposition, sweep::Sweep, vector_3d::Vector3D,
 };
 
-pub fn run(args: &CommandLineArgs) -> Result<(), Box<dyn Error>> {
+pub fn run(param_file: &ParamFile, args: &CommandLineArgs) -> Result<(), Box<dyn Error>> {
     // let directions = get_equally_distributed_directions_on_sphere(NUM_DIRECTIONS);
-    let directions = get_directions(84);
+    let directions = get_directions(param_file.num_directions);
     let grids: Result<Vec<_>> = args
         .grid_files
         .iter()
@@ -23,12 +23,17 @@ pub fn run(args: &CommandLineArgs) -> Result<(), Box<dyn Error>> {
     let run_data_list: Vec<_> = match args.domain_decomposition {
         None => grids?
             .into_iter()
-            .map(|mut grid| run_sweep_on_processors(&mut grid, &directions))
+            .map(|mut grid| run_sweep_on_processors(param_file, &mut grid, &directions))
             .collect(),
         Some(num) => grids?
             .into_iter()
             .map(|mut grid| {
-                run_sweep_and_domain_decomposition_on_processors(&mut grid, &directions, num)
+                run_sweep_and_domain_decomposition_on_processors(
+                    param_file,
+                    &mut grid,
+                    &directions,
+                    num,
+                )
             })
             .collect(),
     };
@@ -59,18 +64,23 @@ fn convert_to_grid(file: &Path) -> Result<Grid> {
 }
 
 fn run_sweep_and_domain_decomposition_on_processors(
+    param_file: &ParamFile,
     mut grid: &mut Grid,
     directions: &[Direction],
     num_processors: usize,
 ) -> RunData {
     do_domain_decomposition(&mut grid, num_processors);
-    let mut sweep = Sweep::new(grid, directions, num_processors);
+    let mut sweep = Sweep::new(param_file, grid, directions, num_processors);
     sweep.run()
 }
 
-fn run_sweep_on_processors(grid: &mut Grid, directions: &[Direction]) -> RunData {
+fn run_sweep_on_processors(
+    param_file: &ParamFile,
+    grid: &mut Grid,
+    directions: &[Direction],
+) -> RunData {
     let num_processors = grid.iter().map(|cell| cell.processor_num).max().unwrap() + 1;
-    let mut sweep = Sweep::new(grid, directions, num_processors);
+    let mut sweep = Sweep::new(param_file, grid, directions, num_processors);
     sweep.run()
 }
 
