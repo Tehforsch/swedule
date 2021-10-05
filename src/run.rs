@@ -14,7 +14,7 @@ use crate::{
 
 pub fn run(args: &CommandLineArgs) -> Result<(), Box<dyn Error>> {
     // let directions = get_equally_distributed_directions_on_sphere(NUM_DIRECTIONS);
-    let directions = get_directions(1);
+    let directions = get_directions(84);
     let grids: Result<Vec<_>> = args
         .grid_files
         .iter()
