@@ -4,7 +4,7 @@ use generational_arena::Index;
 use ordered_float::OrderedFloat;
 use priority_queue::PriorityQueue;
 
-use crate::config::*;
+
 use crate::param_file::ParamFile;
 use crate::task::Task;
 use crate::task_priority::TaskPriority;
