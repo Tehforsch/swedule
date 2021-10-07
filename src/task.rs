@@ -1,4 +1,6 @@
-use crate::{cell::Cell, direction::Direction, task_priority::TaskPriority};
+use crate::cell::Cell;
+use crate::direction::Direction;
+use crate::task_priority::TaskPriority;
 
 #[derive(Clone, Eq, PartialEq, Hash)]
 pub struct Task<'a> {

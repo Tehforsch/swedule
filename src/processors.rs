@@ -1,12 +1,14 @@
-use std::ops::{Index, IndexMut};
+use std::ops::Index;
+use std::ops::IndexMut;
 
 use ordered_float::OrderedFloat;
 use priority_queue::PriorityQueue;
 
-use crate::{
-    grid::DependencyGraph, param_file::ParamFile, processor::Processor,
-    processor_priority::ProcessorPriority, vector_3d::Vector3D,
-};
+use crate::grid::DependencyGraph;
+use crate::param_file::ParamFile;
+use crate::processor::Processor;
+use crate::processor_priority::ProcessorPriority;
+use crate::vector_3d::Vector3D;
 pub struct Processors {
     processors: Vec<Processor>,
     queue: PriorityQueue<usize, ProcessorPriority>,

@@ -1,7 +1,11 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use voronoi_swim::{command_line_args::CommandLineArgs, run::run};
-
 use std::path::PathBuf;
+
+use criterion::black_box;
+use criterion::criterion_group;
+use criterion::criterion_main;
+use criterion::Criterion;
+use voronoi_swim::command_line_args::CommandLineArgs;
+use voronoi_swim::run::run;
 
 pub fn bench_16(c: &mut Criterion) {
     c.bench_function("ics_16_1", |b| b.iter(|| run_ics_16(black_box(1))));

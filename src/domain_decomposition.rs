@@ -1,5 +1,6 @@
 use generational_arena::Index;
-use hilbert::{point_list, Point};
+use hilbert::point_list;
+use hilbert::Point;
 
 use crate::grid::Grid;
 pub fn do_domain_decomposition(grid: &mut Grid, num_processors: usize) {

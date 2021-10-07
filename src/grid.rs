@@ -1,9 +1,13 @@
-use crate::{
-    cell::Cell, dependency::Dependency, direction::Direction, face::Face, graph::Graph, node::Node,
-    task::Task,
-};
 use generational_arena::Index;
 use ordered_float::OrderedFloat;
+
+use crate::cell::Cell;
+use crate::dependency::Dependency;
+use crate::direction::Direction;
+use crate::face::Face;
+use crate::graph::Graph;
+use crate::node::Node;
+use crate::task::Task;
 
 pub type DependencyGraph<'a> = Graph<Task<'a>, Dependency>;
 
@@ -73,10 +77,10 @@ impl Grid {
 
 #[cfg(test)]
 mod tests {
-    use crate::vector_3d::Vector3D;
     use itertools::Itertools;
 
     use super::*;
+    use crate::vector_3d::Vector3D;
     #[test]
     fn dependency_graph() {
         let direction = Direction {

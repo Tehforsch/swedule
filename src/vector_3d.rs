@@ -1,4 +1,5 @@
-use std::ops::{AddAssign, DivAssign};
+use std::ops::AddAssign;
+use std::ops::DivAssign;
 
 use ordered_float::OrderedFloat;
 

@@ -1,5 +1,6 @@
-use clap::Clap;
 use std::error::Error;
+
+use clap::Clap;
 use voronoi_swim::command_line_args::CommandLineArgs;
 use voronoi_swim::param_file::ParamFile;
 use voronoi_swim::run::run;

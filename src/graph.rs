@@ -1,9 +1,9 @@
-use std::hash::Hash;
-
 use std::collections::HashMap;
+use std::hash::Hash;
 use std::iter::FromIterator;
 
-use generational_arena::{Arena, Index};
+use generational_arena::Arena;
+use generational_arena::Index;
 
 use crate::edge::Edge;
 use crate::node::Node;

@@ -1,6 +1,7 @@
 use std::f64::consts::PI;
 
-use crate::config::{DIRECTION_BINS_1, DIRECTION_BINS_84};
+use crate::config::DIRECTION_BINS_1;
+use crate::config::DIRECTION_BINS_84;
 use crate::vector_3d::Vector3D;
 
 #[derive(Hash, PartialEq, Eq, Clone, Debug)]

@@ -1,13 +1,12 @@
 use generational_arena::Index;
 
-use crate::{
-    direction::Direction,
-    grid::{DependencyGraph, Grid},
-    param_file::ParamFile,
-    processor::Processor,
-    processors::Processors,
-    run_data::RunData,
-};
+use crate::direction::Direction;
+use crate::grid::DependencyGraph;
+use crate::grid::Grid;
+use crate::param_file::ParamFile;
+use crate::processor::Processor;
+use crate::processors::Processors;
+use crate::run_data::RunData;
 
 pub struct Sweep<'a> {
     graph: DependencyGraph<'a>,

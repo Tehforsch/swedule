@@ -1,16 +1,24 @@
-use anyhow::{anyhow, Context, Result};
 use std::collections::HashMap;
-use std::{error::Error, fs, io, path::Path};
+use std::error::Error;
+use std::fs;
+use std::io;
+use std::path::Path;
 
+use anyhow::anyhow;
+use anyhow::Context;
+use anyhow::Result;
+
+use crate::cell::Cell;
 use crate::cell::CellId;
 use crate::command_line_args::CommandLineArgs;
-use crate::direction::{get_directions, Direction};
+use crate::direction::get_directions;
+use crate::direction::Direction;
+use crate::domain_decomposition::do_domain_decomposition;
 use crate::grid::Grid;
 use crate::param_file::ParamFile;
 use crate::run_data::RunData;
-use crate::{
-    cell::Cell, domain_decomposition::do_domain_decomposition, sweep::Sweep, vector_3d::Vector3D,
-};
+use crate::sweep::Sweep;
+use crate::vector_3d::Vector3D;
 
 pub fn run(param_file: &ParamFile, args: &CommandLineArgs) -> Result<(), Box<dyn Error>> {
     // let directions = get_equally_distributed_directions_on_sphere(NUM_DIRECTIONS);
