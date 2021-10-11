@@ -17,10 +17,7 @@ use crate::run_data::RunData;
 use crate::sweep::Sweep;
 use crate::vector_3d::Vector3D;
 
-pub fn simulate_grid<
-        U: AsRef<Path>,
-        V: AsRef<Path>
-        >(
+pub fn simulate_grid<U: AsRef<Path>, V: AsRef<Path>>(
     param_file_path: U,
     grid_files: &[V],
 ) -> Result<Vec<RunData>> {
