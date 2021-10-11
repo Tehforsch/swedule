@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::error::Error;
 use std::fs;
 use std::io;
 use std::path::Path;
@@ -10,56 +9,32 @@ use anyhow::Result;
 
 use crate::cell::Cell;
 use crate::cell::CellId;
-use crate::command_line_args::CommandLineArgs;
 use crate::direction::get_directions;
 use crate::direction::Direction;
-use crate::domain_decomposition::do_domain_decomposition;
 use crate::grid::Grid;
 use crate::param_file::ParamFile;
 use crate::run_data::RunData;
 use crate::sweep::Sweep;
 use crate::vector_3d::Vector3D;
 
-pub fn run(param_file: &ParamFile, args: &CommandLineArgs) -> Result<(), Box<dyn Error>> {
-    // let directions = get_equally_distributed_directions_on_sphere(NUM_DIRECTIONS);
+pub fn simulate_grid<
+        U: AsRef<Path>,
+        V: AsRef<Path>
+        >(
+    param_file_path: U,
+    grid_files: &[V],
+) -> Result<Vec<RunData>> {
+    let param_file = ParamFile::read(&param_file_path.as_ref())?;
     let directions = get_directions(param_file.num_directions);
-    let grids: Result<Vec<_>> = args
-        .grid_files
+    let grids: Result<Vec<_>> = grid_files
         .iter()
-        .map(|file| convert_to_grid(file))
+        .map(|file| convert_to_grid(file.as_ref()))
         .collect();
-    let run_data_list: Vec<_> = match args.domain_decomposition {
-        None => grids?
-            .into_iter()
-            .map(|mut grid| run_sweep_on_processors(param_file, &mut grid, &directions))
-            .collect(),
-        Some(num) => grids?
-            .into_iter()
-            .map(|mut grid| {
-                run_sweep_and_domain_decomposition_on_processors(
-                    param_file,
-                    &mut grid,
-                    &directions,
-                    num,
-                )
-            })
-            .collect(),
-    };
-    let reference = &run_data_list[0];
-    for run_data in run_data_list.iter() {
-        if !args.quiet {
-            println!(
-                "{:>4} {:.3} (speedup: {:>6.2}, efficiency {:>6.2}), comm: {:.3}, idle: {:.3}",
-                run_data.num_processors,
-                run_data.time,
-                run_data.get_speedup(reference),
-                run_data.get_efficiency(reference),
-                run_data.time_spent_communicating / run_data.time,
-                run_data.time_spent_waiting / run_data.time,
-            );
-        }
-    }
-    Ok(())
+    let run_data_list: Vec<_> = grids?
+        .into_iter()
+        .map(|mut grid| run_sweep_on_processors(&param_file, &mut grid, &directions))
+        .collect();
+    Ok(run_data_list)
 }
 
 fn convert_to_grid(file: &Path) -> Result<Grid> {
@@ -69,17 +44,6 @@ fn convert_to_grid(file: &Path) -> Result<Grid> {
         return read_grid_file(file).context("While reading file as grid file");
     }
     Err(anyhow!("Unknown file ending"))
-}
-
-fn run_sweep_and_domain_decomposition_on_processors(
-    param_file: &ParamFile,
-    mut grid: &mut Grid,
-    directions: &[Direction],
-    num_processors: usize,
-) -> RunData {
-    do_domain_decomposition(&mut grid, num_processors);
-    let mut sweep = Sweep::new(param_file, grid, directions, num_processors);
-    sweep.run()
 }
 
 fn run_sweep_on_processors(

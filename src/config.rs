@@ -1,5 +1,3 @@
-pub static CONFIG_FILE_NAME: &str = "config.yaml";
-
 pub const DIRECTION_BINS_84: [[f64; 3]; 84] = [
     [-0.0350007, 0.880555, -0.47265],
     [0.739861, -0.620782, 0.259297],

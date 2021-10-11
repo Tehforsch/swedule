@@ -8,8 +8,4 @@ pub struct CommandLineArgs {
     pub param_file: PathBuf,
     #[clap(required = true)]
     pub grid_files: Vec<PathBuf>,
-    #[clap(short)]
-    pub domain_decomposition: Option<usize>,
-    #[clap(short)]
-    pub quiet: bool,
 }

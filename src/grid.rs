@@ -1,4 +1,3 @@
-use generational_arena::Index;
 use ordered_float::OrderedFloat;
 
 use crate::cell::Cell;
@@ -6,7 +5,6 @@ use crate::dependency::Dependency;
 use crate::direction::Direction;
 use crate::face::Face;
 use crate::graph::Graph;
-use crate::node::Node;
 use crate::task::Task;
 
 pub type DependencyGraph<'a> = Graph<Task<'a>, Dependency>;
@@ -64,14 +62,6 @@ impl Grid {
 
     pub fn iter(&self) -> Box<dyn Iterator<Item = &Cell> + '_> {
         self.data.iter()
-    }
-
-    pub fn iter_nodes(&self) -> Box<dyn Iterator<Item = &Node<Cell, Face>> + '_> {
-        self.data.iter_nodes()
-    }
-
-    pub fn get_cell_by_index_mut(&mut self, index: Index) -> &mut Cell {
-        &mut self.data.get_mut(index).unwrap().data
     }
 }
 

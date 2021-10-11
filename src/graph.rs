@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::hash::Hash;
 use std::iter::FromIterator;
 
 use generational_arena::Arena;
@@ -67,31 +66,6 @@ impl<N, E> Graph<N, E> {
         Box::new(edge_data.into_iter())
     }
 
-    pub fn traverse_depth_first(&self, label: &N) -> Vec<&Node<N, E>>
-    where
-        N: Hash + Eq,
-    {
-        let node = self.find_node_by_label(label).unwrap();
-        let mut result = vec![node];
-        for edge in node.edges.iter() {
-            result.extend(
-                self.traverse_depth_first(&self.arena[edge.index].data)
-                    .into_iter(),
-            );
-        }
-        result
-    }
-
-    fn find_node_by_label(&self, label: &N) -> Option<&Node<N, E>>
-    where
-        N: Hash + Eq,
-    {
-        self.arena
-            .iter()
-            .map(|(_, node)| node)
-            .find(|node| &node.data == label)
-    }
-
     pub fn get(&self, index: Index) -> Option<&Node<N, E>> {
         self.arena.get(index)
     }
@@ -128,33 +102,5 @@ impl<N, E> FromIterator<Graph<N, E>> for Graph<N, E> {
             graph.extend(disjoint_subgraph);
         }
         graph
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use std::collections::HashSet;
-
-    use super::*;
-    #[test]
-    fn depth_first_traversal() {
-        let graph = from_node_indices(&[(0, 1), (1, 2), (2, 3), (2, 4), (2, 5)]);
-        let nodes = graph.traverse_depth_first(&0);
-        let labels: Vec<usize> = nodes.iter().map(|node| node.data).collect();
-        assert_eq!(labels, vec![0, 1, 2, 3, 4, 5]);
-    }
-
-    fn from_node_indices(edges: &[(usize, usize)]) -> Graph<usize, ()> {
-        let nodes: HashSet<usize> = edges
-            .iter()
-            .map(|edge| &edge.0)
-            .chain(edges.iter().map(|edge| &edge.1))
-            .map(|node| node.clone())
-            .collect();
-        let mut nodes: Vec<usize> = nodes.into_iter().collect();
-        nodes.sort();
-        let edges: Vec<(usize, usize, ())> =
-            edges.iter().map(|edge| (edge.0, edge.1, ())).collect();
-        Graph::from_nodes_and_edge_list(nodes, edges)
     }
 }
