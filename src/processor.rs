@@ -26,6 +26,7 @@ pub struct Processor {
     pub asleep: bool,
     pub time_spent_communicating: f64,
     pub time_spent_waiting: f64,
+    currently_solving: bool,
 }
 
 impl Processor {
@@ -47,6 +48,7 @@ impl Processor {
             time_spent_waiting: 0.0,
             time_spent_communicating: 0.0,
             param_file: param_file.clone(),
+            currently_solving: false,
         }
     }
 
@@ -56,7 +58,18 @@ impl Processor {
 
     pub fn solve(&mut self, _task: &Task) {
         self.num_solved += 1;
-        self.time += self.param_file.solve_time_offset;
+        self.time += self.param_file.solve_time_per_task;
+    }
+
+    pub fn start_solving(&mut self) {
+        if self.currently_solving {
+            self.time += self.param_file.solve_time_offset;
+            self.currently_solving = true;
+        }
+    }
+
+    pub fn stop_solving(&mut self) {
+        self.currently_solving = false;
     }
 
     pub fn send_tasks(&mut self) -> SendQueue {

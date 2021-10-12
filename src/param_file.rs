@@ -17,6 +17,7 @@ pub struct ParamFile {
     pub recv_time_offset: f64,
     pub recv_time_per_byte: f64,
     pub solve_time_offset: f64,
+    pub solve_time_per_task: f64,
     #[serde(default = "default_message_size")]
     pub size_per_message: f64,
 }

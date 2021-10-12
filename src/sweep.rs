@@ -44,11 +44,13 @@ impl<'a> Sweep<'a> {
             let task_index = processor.get_next_task();
             let mut asleep = false;
             if let Some(task_index) = task_index {
+                processor.start_solving();
                 handle_task_solving(&mut self.graph, processor, task_index);
                 num_to_solve -= 1;
                 num_solved_without_sending += 1;
             }
             if task_index.is_none() || num_solved_without_sending >= self.param_file.batch_size {
+                processor.stop_solving();
                 num_solved_without_sending = 0;
                 let num_received = processor.receive_tasks();
                 if num_received == 0 && task_index.is_none() {
