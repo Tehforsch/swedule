@@ -62,7 +62,7 @@ impl Processor {
     }
 
     pub fn start_solving(&mut self) {
-        if self.currently_solving {
+        if !self.currently_solving {
             self.time += self.param_file.solve_time_offset;
             self.currently_solving = true;
         }
