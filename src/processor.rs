@@ -19,7 +19,7 @@ pub struct Processor {
     pub queue: TaskQueue,
     send_queue: SendQueue,
     receive_queue: ReceiveQueue,
-    domain_center: Vector3D,
+    _domain_center: Vector3D,
     pub num_solved: usize,
     pub time: OrderedFloat<f64>,
     pub num: usize,
@@ -39,7 +39,7 @@ impl Processor {
         Processor {
             num,
             queue,
-            domain_center,
+            _domain_center: domain_center,
             send_queue: SendQueue::new(),
             receive_queue: ReceiveQueue::new(),
             num_solved: 0,
